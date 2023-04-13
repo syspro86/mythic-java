@@ -9,4 +9,5 @@ FROM openjdk:17
 WORKDIR /app
 COPY --from=builder /app/target/mythic-web-0.0.1-SNAPSHOT.jar /app/mythic-web.jar
 ENV TZ=Asia/Seoul
-ENTRYPOINT [ "java", "-jar", "/app/mythic-web.jar" ]
+EXPOSE 8080
+ENTRYPOINT [ "java", "-Dspring.config.location=/config/application.yml" "-jar", "/app/mythic-web.jar" ]
