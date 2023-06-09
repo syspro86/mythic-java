@@ -12,7 +12,7 @@ public class TimelineServiceImpl implements TimelineService {
 
     private final TimelineRepository repo;
 
-    public List<TimelineResult> findTimelineData(String playerRealm, String playerName) {
-        return repo.findTimelineData(playerRealm, playerName);
+    public List<TimelineResult> findTimelineData(String playerRealm, String playerName, boolean allSeason) {
+        return repo.findTimelineData(playerRealm, playerName, allSeason ? 1 : 0);
     }
 }
