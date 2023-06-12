@@ -51,9 +51,9 @@ jobs:
         disable_output: 'false'
         rancher_bearer_token: ${{ secrets.RANCHER_BEARER_TOKEN }}
         rancher_cluster_id: ${{ secrets.RANCHER_CLUSTER_ID }}
-        rancher_namespace: ${{ secrets.RANCHER_NAMESPACE }}
+        rancher_namespace: 'default'
         rancher_project_id: ${{ secrets.RANCHER_PROJECT_ID }}
         rancher_url: ${{ secrets.RANCHER_URL }}
-        rancher_workloads: ${{ secrets.RANCHER_WORKLOADS }}
+        rancher_workloads: 'mythic'
         tls_skip_verification: 'false'
 
