@@ -43,3 +43,17 @@ jobs:
         token: ${{ secrets.TELEGRAM_TOKEN }}
         message: |
           mythic-web docker image updated
+
+    - name: Update rancher deployment
+      uses: th0th/rancher-redeploy-workload@v0.9.3
+      with:
+        debug: 'false'
+        disable_output: 'false'
+        rancher_bearer_token: ${{ secrets.RANCHER_BEARER_TOKEN }}
+        rancher_cluster_id: ${{ secrets.RANCHER_CLUSTER_ID }}
+        rancher_namespace: ${{ secrets.RANCHER_NAMESPACE }}
+        rancher_project_id: ${{ secrets.RANCHER_PROJECT_ID }}
+        rancher_url: ${{ secrets.RANCHER_URL }}
+        rancher_workloads: ${{ secrets.RANCHER_WORKLOADS }}
+        tls_skip_verification: 'false'
+
