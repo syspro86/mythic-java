@@ -10,6 +10,9 @@ import net.zsoo.mythic.mythicweb.dto.MythicDungeon;
 import net.zsoo.mythic.mythicweb.dto.MythicDungeonRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicPeriod;
 import net.zsoo.mythic.mythicweb.dto.MythicPeriodRepository;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayer;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayerId;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayerRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriodRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
@@ -25,6 +28,7 @@ public class MythicCommonServiceImpl implements MythicCommonService {
     private final MythicPeriodRepository periodRepo;
     private final MythicSeasonPeriodRepository seasonPeriodRepo;
     private final PlayerTalentRepository talentRepo;
+    private final MythicPlayerRepository playerRepo;
 
     @Override
     public List<MythicDungeon> findAllDungeons() {
@@ -46,6 +50,11 @@ public class MythicCommonServiceImpl implements MythicCommonService {
         return seasonPeriodRepo.findTopByPeriodOrderBySeasonAsc(period)
                 .map(sp -> sp.getSeason())
                 .orElseThrow(() -> new RuntimeException("no season id for " + period));
+    }
+
+    @Override
+    public Optional<MythicPlayer> findPlayer(String realm, String name) {
+        return playerRepo.findById(new MythicPlayerId(realm, name));
     }
 
     @Override
