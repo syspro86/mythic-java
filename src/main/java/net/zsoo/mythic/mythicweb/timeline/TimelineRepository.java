@@ -28,11 +28,17 @@ public interface TimelineRepository extends JpaRepository<MythicRecord, String> 
                            WHERE MRP.playerName = :playerName
                              AND MRP.playerRealm = :playerRealm
                              AND MR.mythicRating IS NOT NULL
+                             AND (
+                                 :season = 1
+                                 OR
+                                 MR.season = (SELECT MAX(season) FROM MythicSeasonPeriod)
+                             )
                          ) AS RR
                    WHERE RR.RN = 1
                      AND RR.season IS NOT NULL
                    ORDER BY 4, 1
                   """)
       List<TimelineResult> findTimelineData(@Param("playerRealm") String playerRealm,
-                  @Param("playerName") String playerName);
+                  @Param("playerName") String playerName,
+                  @Param("season") int seaon);
 }

@@ -9,7 +9,8 @@ export default {
             'servers': {},
             'serverNames': [],
             'showOption': true,
-            'showDungeons': '0',
+            'showDungeons': true,
+            'allSeason': false,
             'graph2d': null,
             'graphs': {
                 '1': {
@@ -81,7 +82,7 @@ export default {
             if (this.graph2d == null) {
                 return;
             }
-            const g = this.graphs[this.showDungeons];
+            const g = this.graphs[this.showDungeons ? 1 : 0];
             this.graph2d.setItems(g.items);
             this.graph2d.setGroups(g.groups);
             this.graph2d.setOptions(g.options);
@@ -100,7 +101,7 @@ export default {
                 window.localStorage.setItem('relation_character', this.characterName);
             }
 
-            const resp = await fetch('char/mythic_rating/' + encodeURI(this.server) + '/' + encodeURI(this.characterName));
+            const resp = await fetch(`char/mythic_rating/${encodeURI(this.server)}/${encodeURI(this.characterName)}?season=${this.allSeason?1:0}`);
             const data = await resp.json();
             
             let season = 0;
@@ -207,7 +208,7 @@ export default {
                 const timelineMargin = oneWeek;
                 const container = document.getElementById('timeline');
                 container.innerHTML = '';
-                const g = this.graphs[this.showDungeons];
+                const g = this.graphs[this.showDungeons ? 1 : 0];
 
                 const xRangeMin = minTimestamp - timelineMargin;
                 const xRangeMax = maxTimestamp + timelineMargin * 2;
@@ -233,6 +234,14 @@ export default {
                 this.characterName.substring(1).toLowerCase();
             
             fetch('char/scan/' + encodeURI(this.server) + '/' + encodeURI(this.characterName));
+        },
+
+        toggleDungeon() {
+            this.showDungeons = !this.showDungeons;
+        },
+
+        toggleSeason() {
+            this.allSeason = !this.allSeason;
         },
     },
     beforeMount() {
@@ -273,10 +282,8 @@ export default {
             <v-btn class="ma-1" variant="outlined" @click="showOption=!showOption">{{ showOption ? "검색 조건 닫기" : "검색 조건 열기" }}</v-btn>
             <Menu/>
             <Login/>
-            <v-btn-toggle class="ma-1" v-model="showDungeons" mandatory>
-                <v-btn class="pa-1" variant="outlined" value="0">총점만 표시</v-btn>
-                <v-btn class="pa-1" variant="outlined" value="1">던전별 표시</v-btn>
-            </v-btn-toggle>
+            <v-btn class="ma-1" variant="outlined" @click="toggleDungeon">{{ showDungeons ? "던전별 표시" : "총점 표시" }}</v-btn>
+            <v-btn class="ma-1" variant="outlined" @click="toggleSeason">{{ allSeason ? "전체시즌" : "현재시즌" }}</v-btn>
             <v-btn class="ma-1" variant="outlined" @click="scan">재검사</v-btn>
         </v-col>
     </v-row>

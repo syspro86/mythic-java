@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,10 @@ public class TimelineController {
         @GetMapping("/{realm}/{name}")
         public ResponseEntity<List<TimelineResponse>> findTimelineData(
                         @PathVariable("realm") String realm,
-                        @PathVariable("name") String name) {
+                        @PathVariable("name") String name,
+                        @RequestParam("season") int allSeason) {
 
-                List<TimelineResult> timeline = timelineService.findTimelineData(realm, name);
+                List<TimelineResult> timeline = timelineService.findTimelineData(realm, name, allSeason > 0);
                 timeline.stream().mapToInt(t -> t.getPeriod()).distinct();
 
                 List<TimelineResponse> collect = timeline.stream()
