@@ -47,7 +47,7 @@ jobs:
     - name: Update rancher deployment
       uses: th0th/rancher-redeploy-workload@v0.9.3
       with:
-        debug: 'false'
+        debug: 'true'
         disable_output: 'false'
         rancher_bearer_token: ${{ secrets.RANCHER_BEARER_TOKEN }}
         rancher_cluster_id: ${{ secrets.RANCHER_CLUSTER_ID }}
