@@ -1,7 +1,7 @@
 name: Docker Image CI
 
 on:
-  push:
+  pull_request:
     branches: [ master ]
 
 jobs:
@@ -32,7 +32,7 @@ jobs:
         file: docker/Dockerfile
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/mythic-web:latest
+        tags: ghcr.io/${{ github.repository_owner }}/mythic-web:pr
 
     - name: Send update message
       uses: appleboy/telegram-action@master
@@ -40,7 +40,7 @@ jobs:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
         message: |
-          mythic-web docker image updated
+          mythic-web:pr docker image updated
 
     - name: Update rancher deployment
       uses: th0th/rancher-redeploy-workload@v0.9.3
@@ -52,6 +52,6 @@ jobs:
         rancher_namespace: 'default'
         rancher_project_id: ${{ secrets.RANCHER_PROJECT_ID }}
         rancher_url: ${{ secrets.RANCHER_URL }}
-        rancher_workloads: 'mythic'
+        rancher_workloads: 'mythic-pr'
         tls_skip_verification: 'false'
 
