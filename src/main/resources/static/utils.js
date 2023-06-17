@@ -5,7 +5,7 @@ export default {
         }
         const year = d.getYear() + 1900;
         const month = d.getMonth() + 1;
-        const day = d.getDay();
+        const day = d.getDate();
         const hour = d.getHours();
         const minute = d.getMinutes();
         const second = d.getSeconds();
