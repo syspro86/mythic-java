@@ -255,6 +255,9 @@ export default {
                 this.minimumRun = run
             }
         }
+        if (this.server == '' || this.server == null) {
+            this.server = '아즈샤라';
+        }
     },
     mounted() {
         fetch('form/realms').then(async resp => {

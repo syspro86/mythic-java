@@ -55,6 +55,9 @@ export default {
             this.server = window.localStorage.getItem('relation_server')
             this.characterName = window.localStorage.getItem('relation_character')
         }
+        if (this.server == '' || this.server == null) {
+            this.server = '아즈샤라';
+        }
     },
     mounted() {
         fetch('form/realms').then(async resp => {
