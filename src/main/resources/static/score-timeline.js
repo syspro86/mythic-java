@@ -102,7 +102,8 @@ export default {
             }
 
             const resp = await fetch(`char/mythic_rating/${encodeURI(this.server)}/${encodeURI(this.characterName)}?season=${this.allSeason?1:0}`);
-            const data = await resp.json();
+            const body = await resp.json();
+            const data = body;
             
             let season = 0;
             let period = 0;

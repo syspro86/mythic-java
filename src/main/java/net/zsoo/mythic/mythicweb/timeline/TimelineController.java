@@ -26,8 +26,6 @@ public class TimelineController {
                         @RequestParam("season") int allSeason) {
 
                 List<TimelineResult> timeline = timelineService.findTimelineData(realm, name, allSeason > 0);
-                timeline.stream().mapToInt(t -> t.getPeriod()).distinct();
-
                 List<TimelineResponse> collect = timeline.stream()
                                 .map(r -> new TimelineResponse(r.getDungeonId(), r.getDungeonName(),
                                                 r.getMythicRating(), r.getPeriod(), r.getSeason(), r.getTimestamp()))
