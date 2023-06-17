@@ -1,5 +1,6 @@
 import Login from './login.js'
 import Menu from './menu.js'
+import Utils from './utils.js'
 
 export default {
     data() {
@@ -45,6 +46,9 @@ export default {
 
             fetch('char/scan/' + encodeURI(this.server) + '/' + encodeURI(this.characterName));
         },
+        formatDate(d) {
+            return Utils.formatDate(d);
+        },
     },
     beforeMount() {
         if (window.localStorage) {
@@ -87,12 +91,12 @@ export default {
         </v-row>
         <v-row no-gutters v-if="player != null">
             <v-col>
-                <div>마지막 갱신 일자: {{ new Date(player?.lastUpdateTs ?? 0) }}</div>
+                <div>마지막 갱신 일자: {{ formatDate(player?.lastUpdateTs ?? 0) }}</div>
             </v-col>
         </v-row>
         <v-row v-for="record in records" no-gutters style="background-color: #f0f0f0">
             <v-col>
-                {{ new Date(record.completedTimestamp).toISOString() }}
+                {{ formatDate(record.completedTimestamp) }}
             </v-col>
             <v-col>
                 {{ dungeons[record.dungeonId] }}
