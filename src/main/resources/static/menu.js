@@ -3,6 +3,7 @@ export default {
     data() {
         return {
             'items': [
+                { 'title': '쐐기 기록', 'url': 'recent.html' },
                 { 'title': '친구 그래프', 'url': 'relation.html' },
                 { 'title': '쐐기평점 타임라인', 'url': 'score-timeline.html' },
             ]
