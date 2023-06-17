@@ -12,7 +12,6 @@ export default {
             'showDungeons': true,
             'allSeason': false,
             'graph2d': null,
-            'player': null,
             'graphs': {
                 '1': {
                     'items': [],
@@ -104,8 +103,7 @@ export default {
 
             const resp = await fetch(`char/mythic_rating/${encodeURI(this.server)}/${encodeURI(this.characterName)}?season=${this.allSeason?1:0}`);
             const body = await resp.json();
-            const data = body.data;
-            this.player = body.player;
+            const data = body;
             
             let season = 0;
             let period = 0;
@@ -293,11 +291,6 @@ export default {
     <v-row no-gutters>
         <v-col>
             <div id="timeline"></div>
-        </v-col>
-    </v-row>
-    <v-row no-gutters v-if="player != null">
-        <v-col>
-            <div>마지막 갱신 일자: {{ new Date(player?.lastUpdateTs ?? 0) }}</div>
         </v-col>
     </v-row>
     </v-container>
