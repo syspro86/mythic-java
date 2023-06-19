@@ -1,15 +1,10 @@
 package net.zsoo.mythic.mythicweb.dto;
 
-import java.util.Optional;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
