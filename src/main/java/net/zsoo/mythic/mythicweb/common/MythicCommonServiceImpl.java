@@ -71,5 +71,14 @@ public class MythicCommonServiceImpl implements MythicCommonService {
             talents.forEach(t -> t.setLastUpdateTs(timestamp));
             talentRepo.saveAll(talents);
         }
+
+        MythicPlayer player = playerRepo.findById(new MythicPlayerId(realm, name)).orElseGet(() -> {
+            MythicPlayer mp = new MythicPlayer();
+            mp.setPlayerRealm(realm);
+            mp.setPlayerName(name);
+            return mp;
+        });
+        player.setLastUpdateTs(timestamp);
+        playerRepo.save(player);
     }
 }
