@@ -1,11 +1,6 @@
 package net.zsoo.mythic.mythicweb.wowapi;
 
-import java.util.HashMap;
-
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import lombok.RequiredArgsConstructor;
 import net.zsoo.mythic.mythicweb.wowapi.battlenet.BattlenetOAuthAPI;
