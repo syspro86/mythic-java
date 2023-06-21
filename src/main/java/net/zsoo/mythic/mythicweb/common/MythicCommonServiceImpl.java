@@ -65,6 +65,7 @@ public class MythicCommonServiceImpl implements MythicCommonService {
             talent.setPlayerRealm(realm);
             talent.setPlayerName(name);
             talent.setSpecId(0);
+            talent.setTalentCode("-");
             talent.setLastUpdateTs(timestamp);
             talentRepo.save(talent);
         } else {
@@ -76,6 +77,8 @@ public class MythicCommonServiceImpl implements MythicCommonService {
             MythicPlayer mp = new MythicPlayer();
             mp.setPlayerRealm(realm);
             mp.setPlayerName(name);
+            mp.setClassName("-");
+            mp.setSpecName("-");
             return mp;
         });
         player.setLastUpdateTs(timestamp);
