@@ -44,7 +44,7 @@ public interface CrawlerRepository extends Repository<MythicPlayer, MythicPlayer
          AND MR.keystoneLevel >= 20
          AND MR.keystoneUpgrade >= 1
          AND MP.lastUpdateTs < :timestamp
-       ORDER BY MR.recordId ASC
+       ORDER BY MP.lastUpdateTs ASC
        LIMIT 1
       """)
   Optional<NextPlayer> findNextUpdatePlayer3(long timestamp);
