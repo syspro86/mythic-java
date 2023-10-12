@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Mythic+</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SPCLB9JFLZ"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-SPCLB9JFLZ');
+</script>
+</head>
+
+<body>
+    <div id="app" style="height: 100vh"></div>
+    <script src="//unpkg.com/vis-charts@latest/dist/vis.min.js"></script>
+    <link href="//unpkg.com/vis-charts@latest/dist/vis.min.css" rel="stylesheet" type="text/css">
+    <link href="//cdn.jsdelivr.net/npm/vuetify@3.1.13/dist/vuetify.min.css" rel="stylesheet"/>
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
+                "vuetify": "https://cdn.jsdelivr.net/npm/vuetify@3.1.13/dist/vuetify.esm.js"
+            }
+        }
+      </script>
+
+    <script type="module">
+        import { createApp } from 'vue'
+        import { createVuetify } from 'vuetify'
+        import Relation from './relation.js'
+        const app = createApp(Relation);
+        app.use(createVuetify());
+        app.mount('#app');
+    </script>
+</body>
+
+</html>
