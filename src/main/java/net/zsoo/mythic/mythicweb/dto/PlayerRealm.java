@@ -11,4 +11,5 @@ public class PlayerRealm {
     private int realmId;
     private String realmSlug;
     private String realmName;
+    private boolean isConnectedRealm;
 }

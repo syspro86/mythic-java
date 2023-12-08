@@ -1,7 +1,5 @@
 package net.zsoo.mythic.mythicweb.battlenet.wow;
 
-import java.util.Map;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfile;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfileSeason;
 
-@FeignClient(name = "api.blizzard.com", url = "https://${battlenet.region}.api.blizzard.com/", configuration = ProfileAPIConfiguration.class, dismiss404 = true)
+@FeignClient(name = "api.blizzard.com/profile", url = "https://${battlenet.region}.api.blizzard.com/", configuration = ProfileAPIConfiguration.class, dismiss404 = true)
 public interface ProfileAPI {
         @RequestMapping(method = RequestMethod.GET, value = "/profile/wow/character/{realmSlug}/{characterName}/mythic-keystone-profile")
         MythicKeystoneProfile mythicKeystoneProfile(
@@ -23,6 +21,6 @@ public interface ProfileAPI {
         MythicKeystoneProfileSeason mythicKeystoneProfileSeason(
                         @PathVariable("realmSlug") String realmSlug,
                         @PathVariable("characterName") String characterName,
-                        @PathVariable("season") String season,
+                        @PathVariable("season") int season,
                         @RequestParam("access_token") String accessToken);
 }

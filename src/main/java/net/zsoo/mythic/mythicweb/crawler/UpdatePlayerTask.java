@@ -3,13 +3,10 @@ package net.zsoo.mythic.mythicweb.crawler;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.zsoo.mythic.mythicweb.battlenet.wow.ProfileAPI;
@@ -26,38 +23,38 @@ import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 @RequiredArgsConstructor
 public class UpdatePlayerTask {
     private final CrawlerRepository crawlerRepo;
-    @Qualifier("apiToken")
-    private final Supplier<String> apiTokenSupplier;
+    private final CrawlerCommonService crawlerService;
+    @Qualifier("accessToken")
+    private final Supplier<String> accessTokenSupplier;
     private final ProfileAPI wowApi;
     private final PlayerRealmRepository realmRepo;
-    private final ApplicationEventPublisher eventPublisher;
 
-    @Scheduled(cron = "${mythic.crawler.cron:-}")
+    @Scheduled(cron = "${mythic.crawler.player.cron:-}")
     public void onTimer() {
         long now = System.currentTimeMillis();
         log.debug("time: {}", now);
 
-        String apiToken = apiTokenSupplier.get();
-        log.debug("token: {}", apiToken);
+        String accessToken = accessTokenSupplier.get();
+        log.debug("token: {}", accessToken);
 
         for (int i = 0; i < 100; i++) {
             NextPlayer nextPlayer = getNextPlayer(now);
-            updatePlayer(apiToken, nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName());
+            updatePlayer(accessToken, nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName());
         }
     }
 
-    private void updatePlayer(String apiToken, String playerRealm, String playerName) {
+    private void updatePlayer(String accessToken, String playerRealm, String playerName) {
         log.debug("player: {}-{}", playerName, playerRealm);
         PlayerRealm realm = realmRepo.findByRealmName(playerRealm)
                 .orElseThrow(() -> new RuntimeException("invalid realm name " + playerRealm));
 
-        MythicKeystoneProfile result = wowApi.mythicKeystoneProfile(realm.getRealmSlug(), playerName, apiToken);
+        MythicKeystoneProfile result = wowApi.mythicKeystoneProfile(realm.getRealmSlug(), playerName, accessToken);
         if (result.getSeasons() == null) {
             return;
         }
         result.getSeasons().forEach(season -> {
             MythicKeystoneProfileSeason seasonResult = wowApi.mythicKeystoneProfileSeason(realm.getRealmSlug(),
-                    playerName, season.getId(), apiToken);
+                    playerName, season.getId(), accessToken);
             log.debug("season: {}", seasonResult);
             for (BestRun run : seasonResult.getBestRuns()) {
                 log.debug("run: {}", run);

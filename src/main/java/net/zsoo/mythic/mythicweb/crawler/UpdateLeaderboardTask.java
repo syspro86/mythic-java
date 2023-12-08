@@ -1,6 +1,6 @@
 package net.zsoo.mythic.mythicweb.crawler;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,12 +9,11 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.zsoo.mythic.mythicweb.battlenet.wow.DataAPI;
 import net.zsoo.mythic.mythicweb.battlenet.wow.ProfileAPI;
-import net.zsoo.mythic.mythicweb.battlenet.wow.dto.BestRun;
-import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfile;
-import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfileSeason;
-import net.zsoo.mythic.mythicweb.battlenet.wow.dto.RunMember;
-import net.zsoo.mythic.mythicweb.crawler.CrawlerRepository.NextPlayer;
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.KeyIdName;
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicLeaderboardIndex;
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicLeaderboardPeriod;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 
@@ -22,10 +21,11 @@ import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 @Component
 @RequiredArgsConstructor
 public class UpdateLeaderboardTask {
-    private final CrawlerRepository crawlerRepo;
-    @Qualifier("apiToken")
-    private final Supplier<String> apiTokenSupplier;
-    private final ProfileAPI wowApi;
+    private final CrawlerCommonService crawlerService;
+    @Qualifier("accessToken")
+    private final Supplier<String> accessTokenSupplier;
+    private final PeriodTask periodTask;
+    private final DataAPI dataApi;
     private final PlayerRealmRepository realmRepo;
 
     @Scheduled(cron = "${mythic.crawler.leaderboard.cron:-}")
@@ -33,49 +33,38 @@ public class UpdateLeaderboardTask {
         long now = System.currentTimeMillis();
         log.debug("time: {}", now);
 
-        String apiToken = apiTokenSupplier.get();
-        log.debug("token: {}", apiToken);
+        int period = periodTask.getPeriod();
 
-        for (int i = 0; i < 100; i++) {
-            NextPlayer nextPlayer = getNextPlayer(now);
-            updatePlayer(apiToken, nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName());
-        }
+        String accessToken = accessTokenSupplier.get();
+        log.debug("token: {}", accessToken);
+
+        List<PlayerRealm> realms = realmRepo.findAll();
+        realms.stream()
+                .filter(r -> r.isConnectedRealm())
+                .forEach(realm -> updateRealm(realm, accessToken, period));
+
+        log.debug("done!");
     }
 
-    private void updatePlayer(String apiToken, String playerRealm, String playerName) {
-        log.debug("player: {}-{}", playerName, playerRealm);
-        PlayerRealm realm = realmRepo.findByRealmName(playerRealm)
-                .orElseThrow(() -> new RuntimeException("invalid realm name " + playerRealm));
-
-        MythicKeystoneProfile result = wowApi.mythicKeystoneProfile(realm.getRealmSlug(), playerName, apiToken);
-        if (result.getSeasons() == null) {
+    private void updateRealm(PlayerRealm realm, String accessToken, int period) {
+        MythicLeaderboardIndex index = dataApi.mythicLeaderboardIndex(realm.getRealmId(), accessToken);
+        if (index.getCurrentLeaderboards() == null) {
             return;
         }
-        result.getSeasons().forEach(season -> {
-            MythicKeystoneProfileSeason seasonResult = wowApi.mythicKeystoneProfileSeason(realm.getRealmSlug(),
-                    playerName, season.getId(), apiToken);
-            log.debug("season: {}", seasonResult);
-            for (BestRun run : seasonResult.getBestRuns()) {
-                log.debug("run: {}", run);
-                for (RunMember member : run.getMembers()) {
-                    log.debug("member: {}", member);
-                }
-            }
+        index.getCurrentLeaderboards().forEach(id -> updateRealmDungeon(realm, id.getId(), period, accessToken));
+    }
+
+    private void updateRealmDungeon(PlayerRealm realm, int dungeonId, int period, String accessToken) {
+        MythicLeaderboardPeriod leaderboard = dataApi.mythicLeaderboardPeriod(realm.getRealmId(),
+                dungeonId, period, accessToken);
+        if (leaderboard.getLeadingGroups() == null) {
+            return;
+        }
+        leaderboard.getLeadingGroups().forEach(run -> {
+            KeyIdName dungeon = new KeyIdName();
+            dungeon.setId(dungeonId);
+            run.setDungeon(dungeon);
+            crawlerService.saveRun(run);
         });
     }
-
-    private NextPlayer getNextPlayer(long now) {
-        Optional<NextPlayer> player = crawlerRepo.findNextUpdatePlayer1();
-        if (!player.isPresent()) {
-            player = crawlerRepo.findNextUpdatePlayer2();
-        }
-        if (!player.isPresent()) {
-            player = crawlerRepo.findNextUpdatePlayer3(now - 1000 * 60 * 60 * 24);
-        }
-        if (!player.isPresent()) {
-            player = crawlerRepo.findNextUpdatePlayer4();
-        }
-        return player.get();
-    }
-
 }

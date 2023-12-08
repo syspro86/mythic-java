@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class KeyIdName {
     private Key key;
-    private String id;
+    private int id;
     private String name;
 
     @Data
