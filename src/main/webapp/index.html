@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Mythic+</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "45569294ee4847d087d0f08351df3be8"}'></script><!-- End Cloudflare Web Analytics -->
+<script src="//unpkg.com/vis-charts@latest/dist/vis.min.js"></script>
+<link href="//unpkg.com/vis-charts@latest/dist/vis.min.css" rel="stylesheet" type="text/css">
+<link href="//cdn.jsdelivr.net/npm/vuetify@3.4.6/dist/vuetify-labs.css" rel="stylesheet"/>
+<link href="//cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet"/>
+</head>
+
+<body>
+    <div id="app" style="height: 100vh"></div>
+    <script type="importmap">
+        {
+            "imports": {
+				"vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
+				"vuetify": "https://cdn.jsdelivr.net/npm/vuetify@3.4.6/dist/vuetify-labs.esm.js"
+            }
+        }
+	</script>
+
+    <script type="module">
+        import { createApp } from 'vue'
+        import { createVuetify } from 'vuetify'
+        import MythicApp from './app.js'
+        const app = createApp(MythicApp);
+        app.use(createVuetify({
+			theme: {
+    			defaultTheme: 'light',
+			}
+		}));
+        app.mount('#app');
+    </script>
+</body>
+
+</html>
