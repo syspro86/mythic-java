@@ -12,6 +12,8 @@
 	<artifactId>mythic-web</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>mythic-web</name>
+	<packaging>war</packaging>
+
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>17</java.version>
