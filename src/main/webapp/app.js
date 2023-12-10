@@ -7,7 +7,7 @@ import ScoreTimeline from "./score-timeline.js";
 export default {
   data() {
     return {
-      menuIndex: 0,
+      menuIndex: 1,
       drawerVisible: false,
       showOption: true,
       characterName: "",
