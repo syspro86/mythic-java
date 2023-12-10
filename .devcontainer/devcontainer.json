@@ -5,7 +5,9 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/base:debian",
 	"features": {
-		"ghcr.io/devcontainers/features/java:1": {},
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": 17
+		},
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {
 			"moby": true
 		}
