@@ -21,7 +21,7 @@ public interface MythicRecordRepository extends JpaRepository<MythicRecord, Stri
          AND MRP.playerRealm = :playerRealm
          AND (:timestamp = 0 OR MR.completedTimestamp < :timestamp)
        ORDER BY MR.completedTimestamp DESC
-       LIMIT 100
+       LIMIT :count
       """)
-  List<MythicRecord> findRecentRecords(String playerRealm, String playerName, int timestamp);
+  List<MythicRecord> findRecentRecords(String playerRealm, String playerName, int timestamp, int count);
 }

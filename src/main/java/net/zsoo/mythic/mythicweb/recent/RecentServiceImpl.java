@@ -14,6 +14,6 @@ public class RecentServiceImpl implements RecentService {
     private final MythicRecordRepository recordRepo;
 
     public List<MythicRecord> findRecord(String realm, String name, int timestamp) {
-        return recordRepo.findRecentRecords(realm, name, timestamp);
+        return recordRepo.findRecentRecords(realm, name, timestamp, 100);
     }
 }

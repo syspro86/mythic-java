@@ -3,6 +3,7 @@ package net.zsoo.mythic.mythicweb.dto;
 import java.util.List;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
@@ -22,6 +23,6 @@ public class MythicRecord {
     private int keystoneUpgrade;
     private float mythicRating;
 
-    @OneToMany(mappedBy = "recordId")
+    @OneToMany(mappedBy = "recordId", fetch = FetchType.EAGER)
     List<MythicRecordPlayer> players;
 }
