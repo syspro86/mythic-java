@@ -1,7 +1,14 @@
 package net.zsoo.mythic.mythicweb.telegram;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.zsoo.mythic.mythicweb.dto.MythicBotuser;
 import net.zsoo.mythic.mythicweb.dto.MythicBotuserPlayer;
 import net.zsoo.mythic.mythicweb.dto.MythicBotuserRepository;
@@ -17,6 +25,7 @@ import net.zsoo.mythic.mythicweb.dto.MythicDungeonRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicRecord;
 import net.zsoo.mythic.mythicweb.dto.MythicRecordRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TelegramServiceImpl implements TelegramService {
@@ -61,12 +70,18 @@ public class TelegramServiceImpl implements TelegramService {
         }
         if (botUser.getWebSessionId() == null || botUser.getWebSessionId().equals("")) {
             String sid = sessionPrefix + chatId + sessionSuffix;
-            // sid = sha256(sid);
-            botUser.setWebSessionId(sid);
-            // botUserRepo.save(botUser);
+            try {
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] hash = digest.digest(sid.getBytes(StandardCharsets.UTF_8));
+                sid = Base64.getUrlEncoder().encodeToString(hash);
+                botUser.setWebSessionId(sid);
+                botUserRepo.save(botUser);
+            } catch (NoSuchAlgorithmException e) {
+                log.error("sha256 error", e);
+                return null;
+            }
         }
-        // return "https://mythic.zsoo.net/?user=" + botUser.getWebSessionId();
-        return null;
+        return "https://mythic.zsoo.net/?user=" + botUser.getWebSessionId();
     }
 
     private String report(long chatId) {
@@ -115,10 +130,11 @@ public class TelegramServiceImpl implements TelegramService {
 
         MessageFormat mf = new MessageFormat("{0}+{1} {2}\n({3}) {4}분 {5}초");
         MessageFormat mf2 = new MessageFormat("\n{0}-{1} {2} {3}");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         return records.stream().map(r -> mf.format(new Object[] {
                 dungeonRepo.findById(r.getDungeonId()).map(MythicDungeon::getDungeonName).orElse("??"),
                 r.getKeystoneLevel(),
-                r.getCompletedTimestamp(),
+                df.format(new Date(r.getCompletedTimestamp())),
                 r.getKeystoneUpgrade(),
                 r.getDuration() / 60000,
                 (r.getDuration() / 1000) % 60 })
