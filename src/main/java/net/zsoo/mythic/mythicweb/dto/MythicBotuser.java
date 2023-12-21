@@ -17,6 +17,5 @@ public class MythicBotuser {
     private String webSessionId;
 
     @OneToMany(mappedBy = "userId", fetch = FetchType.EAGER)
-    @JoinColumn
     List<MythicBotuserPlayer> players;
 }
