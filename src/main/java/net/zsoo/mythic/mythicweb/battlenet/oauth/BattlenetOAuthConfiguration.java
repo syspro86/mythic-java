@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Bean;
 import feign.auth.BasicAuthRequestInterceptor;
 
 public class BattlenetOAuthConfiguration {
-    @Value("${battlenet.api_id}")
+    @Value("${battlenet.api_id:}")
     private String apiId;
-    @Value("${battlenet.api_secret}")
+    @Value("${battlenet.api_secret:}")
     private String apiSecret;
 
     @Bean

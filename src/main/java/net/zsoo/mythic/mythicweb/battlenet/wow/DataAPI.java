@@ -10,7 +10,7 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicLeaderboardIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicLeaderboardPeriod;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.PeriodIndex;
 
-@FeignClient(name = "api.blizzard.com/data", url = "https://${battlenet.region}.api.blizzard.com/", configuration = DataAPIConfiguration.class, dismiss404 = true)
+@FeignClient(name = "api.blizzard.com/data", url = "https://${battlenet.region:kr}.api.blizzard.com/", configuration = DataAPIConfiguration.class, dismiss404 = true)
 public interface DataAPI {
         @RequestMapping(method = RequestMethod.GET, value = "/data/wow/mythic-keystone/period/index")
         PeriodIndex periodIndex(@RequestParam("access_token") String accessToken);

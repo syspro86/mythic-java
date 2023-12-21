@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import feign.RequestInterceptor;
 
 public class ProfileAPIConfiguration {
-    @Value("${battlenet.region}")
+    @Value("${battlenet.region:kr}")
     private String region;
 
     private String getNamespace() {
