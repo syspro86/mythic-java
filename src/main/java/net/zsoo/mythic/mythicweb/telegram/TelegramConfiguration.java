@@ -50,7 +50,7 @@ public class TelegramConfiguration {
             long chatId = update.getMessage().getChat().getId();
             String text = update.getMessage().getText();
             String reply = telegramService.onMessage(chatId, text);
-            if (reply == null) {
+            if (reply == null || reply.equals("")) {
                 return;
             }
             try {
