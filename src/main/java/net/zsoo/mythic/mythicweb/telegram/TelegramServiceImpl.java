@@ -64,7 +64,7 @@ public class TelegramServiceImpl implements TelegramService {
         MythicBotuser botUser = botUserRepo.findById(Long.toString(chatId)).orElse(null);
         if (botUser == null) {
             botUser = new MythicBotuser();
-            botUser.setUserId(Long.toString(chatId));
+            botUser.setId(Long.toString(chatId));
             botUser.setPlayers(new ArrayList<>());
             botUserRepo.save(botUser);
         }
@@ -98,14 +98,14 @@ public class TelegramServiceImpl implements TelegramService {
                 return "일치하는 정보가 없습니다.";
             }
             botUser = new MythicBotuser();
-            botUser.setUserId(Long.toString(chatId));
+            botUser.setId(Long.toString(chatId));
             botUser.setPlayers(new ArrayList<>());
         }
         String realm = rn.substring(rn.indexOf("-") + 1);
         String name = rn.substring(0, rn.indexOf("-"));
         if (add) {
             MythicBotuserPlayer player = new MythicBotuserPlayer();
-            player.setUserId(botUser.getUserId());
+            player.setBotuser(botUser);
             player.setPlayerRealm(realm);
             player.setPlayerName(name);
             botUser.getPlayers().add(player);

@@ -1,16 +1,24 @@
 package net.zsoo.mythic.mythicweb.dto;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.Data;
 
 @Data
 @Entity
 public class MythicBotuserPlayer {
     @Id
-    private String userId;
-    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
     private String playerRealm;
-    @Id
     private String playerName;
+
+    @ManyToOne
+    @PrimaryKeyJoinColumn(name = "id")
+    private MythicBotuser botuser;
 }
