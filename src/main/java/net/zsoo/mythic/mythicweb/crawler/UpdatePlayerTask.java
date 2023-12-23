@@ -53,24 +53,32 @@ public class UpdatePlayerTask {
                 .orElseThrow(() -> new RuntimeException("invalid realm name " + playerRealm));
 
         MythicKeystoneProfile result = wowApi.mythicKeystoneProfile(realm.getRealmSlug(), playerName, accessToken);
-        if (result.getSeasons() == null) {
+        if (result == null) {
             return;
         }
         var period = result.getCurrentPeriod();
-        period.getBestRuns().forEach(run -> {
-            log.debug("run: {}", run);
-            crawlerService.saveRun(crawlerService.getSeason(), period.getPeriod().getId(), run);
-        });
-        result.getSeasons().forEach(season -> {
-            MythicKeystoneProfileSeason seasonResult = wowApi.mythicKeystoneProfileSeason(realm.getRealmSlug(),
-                    playerName, season.getId(), accessToken);
-            log.debug("season: {}", seasonResult);
-            for (BestRun run : seasonResult.getBestRuns()) {
+        if (period != null) {
+            period.getBestRuns().forEach(run -> {
                 log.debug("run: {}", run);
-                crawlerService.saveRun(season.getId(), periodRepo.findByTimestamp(run.getCompletedTimestamp())
-                        .map(p -> p.getPeriod()).orElse(0), run);
-            }
-        });
+                crawlerService.saveRun(crawlerService.getSeason(), period.getPeriod().getId(), run);
+            });
+        }
+        var seasons = result.getSeasons();
+        if (seasons != null) {
+            seasons.forEach(season -> {
+                MythicKeystoneProfileSeason seasonResult = wowApi.mythicKeystoneProfileSeason(realm.getRealmSlug(),
+                        playerName, season.getId(), accessToken);
+                if (seasonResult == null || seasonResult.getBestRuns() == null) {
+                    return;
+                }
+                log.debug("season: {}", seasonResult);
+                for (BestRun run : seasonResult.getBestRuns()) {
+                    log.debug("run: {}", run);
+                    crawlerService.saveRun(season.getId(), periodRepo.findByTimestamp(run.getCompletedTimestamp())
+                            .map(p -> p.getPeriod()).orElse(0), run);
+                }
+            });
+        }
     }
 
     private NextPlayer getNextPlayer(long now) {

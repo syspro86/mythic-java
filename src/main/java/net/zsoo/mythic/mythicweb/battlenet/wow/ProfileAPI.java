@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfile;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfileSeason;
 
-@FeignClient(name = "api.blizzard.com/profile", url = "https://${mythic.battlenet.region:kr}.api.blizzard.com/", configuration = ProfileAPIConfiguration.class, dismiss404 = true)
+@FeignClient(name = "api.blizzard.com/profile", url = "https://${mythic.battlenet.region:kr}.api.blizzard.com/", configuration = ProfileAPIConfiguration.class, dismiss404 = true, fallback = ProfileAPIFallback.class)
 public interface ProfileAPI {
         @RequestMapping(method = RequestMethod.GET, value = "/profile/wow/character/{realmSlug}/{characterName}/mythic-keystone-profile")
         MythicKeystoneProfile mythicKeystoneProfile(
