@@ -9,12 +9,12 @@ import org.springframework.context.annotation.Bean;
 import feign.RequestInterceptor;
 import feign.Retryer;
 
-public class DataAPIConfiguration {
+public class StaticDataAPIConfiguration {
     @Value("${mythic.battlenet.region:kr}")
     private String region;
 
     private String getNamespace() {
-        return "dynamic-" + region;
+        return "static-" + region;
     }
 
     private String getLocale() {

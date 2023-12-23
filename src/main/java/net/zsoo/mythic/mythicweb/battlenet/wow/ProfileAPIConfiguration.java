@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 import feign.RequestInterceptor;
+import feign.Retryer;
 
 public class ProfileAPIConfiguration {
-    @Value("${battlenet.region:kr}")
+    @Value("${mythic.battlenet.region:kr}")
     private String region;
 
     private String getNamespace() {
@@ -38,5 +39,10 @@ public class ProfileAPIConfiguration {
                 template.query("locale", getLocale());
             }
         };
+    }
+
+    @Bean
+    public Retryer retryer() {
+        return new Retryer.Default(100, 2000, 3);
     }
 }

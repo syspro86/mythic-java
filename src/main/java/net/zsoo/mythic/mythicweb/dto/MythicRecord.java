@@ -23,6 +23,6 @@ public class MythicRecord {
     private int keystoneUpgrade;
     private float mythicRating;
 
-    @OneToMany(mappedBy = "recordId", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "record", fetch = FetchType.EAGER)
     List<MythicRecordPlayer> players;
 }

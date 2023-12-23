@@ -6,4 +6,5 @@ import lombok.Data;
 public class RunMember {
     private RunMemberProfile profile;
     private RunMemberProfile character;
+    private KeyIdName specialization;
 }

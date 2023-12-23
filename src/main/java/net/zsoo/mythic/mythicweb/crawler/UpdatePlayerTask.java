@@ -1,9 +1,7 @@
 package net.zsoo.mythic.mythicweb.crawler;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +11,9 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.ProfileAPI;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.BestRun;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfile;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfileSeason;
-import net.zsoo.mythic.mythicweb.battlenet.wow.dto.RunMember;
 import net.zsoo.mythic.mythicweb.crawler.CrawlerRepository.NextPlayer;
+import net.zsoo.mythic.mythicweb.dto.MythicPeriodRepository;
+import net.zsoo.mythic.mythicweb.dto.MythicSeasonRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 
@@ -24,22 +23,28 @@ import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 public class UpdatePlayerTask {
     private final CrawlerRepository crawlerRepo;
     private final CrawlerCommonService crawlerService;
-    @Qualifier("accessToken")
-    private final Supplier<String> accessTokenSupplier;
     private final ProfileAPI wowApi;
     private final PlayerRealmRepository realmRepo;
+    private final MythicSeasonRepository seasonRepo;
+    private final MythicPeriodRepository periodRepo;
 
     @Scheduled(cron = "${mythic.crawler.player.cron:-}")
     public void onTimer() {
         long now = System.currentTimeMillis();
         log.debug("time: {}", now);
 
-        String accessToken = accessTokenSupplier.get();
+        String accessToken = crawlerService.getAccessToken();
         log.debug("token: {}", accessToken);
 
-        for (int i = 0; i < 100; i++) {
+        long endTime = now - now % 60000 + 55000;
+
+        while (true) {
             NextPlayer nextPlayer = getNextPlayer(now);
             updatePlayer(accessToken, nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName());
+
+            if (System.currentTimeMillis() >= endTime) {
+                break;
+            }
         }
     }
 
@@ -52,15 +57,19 @@ public class UpdatePlayerTask {
         if (result.getSeasons() == null) {
             return;
         }
+        var period = result.getCurrentPeriod();
+        period.getBestRuns().forEach(run -> {
+            log.debug("run: {}", run);
+            crawlerService.saveRun(crawlerService.getSeason(), period.getPeriod().getId(), run);
+        });
         result.getSeasons().forEach(season -> {
             MythicKeystoneProfileSeason seasonResult = wowApi.mythicKeystoneProfileSeason(realm.getRealmSlug(),
                     playerName, season.getId(), accessToken);
             log.debug("season: {}", seasonResult);
             for (BestRun run : seasonResult.getBestRuns()) {
                 log.debug("run: {}", run);
-                for (RunMember member : run.getMembers()) {
-                    log.debug("member: {}", member);
-                }
+                crawlerService.saveRun(season.getId(), periodRepo.findByTimestamp(run.getCompletedTimestamp())
+                        .map(p -> p.getPeriod()).orElse(0), run);
             }
         });
     }
@@ -78,5 +87,4 @@ public class UpdatePlayerTask {
         }
         return player.get();
     }
-
 }

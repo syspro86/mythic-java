@@ -8,16 +8,12 @@ import lombok.Data;
 
 @Data
 public class BestRun {
-    private long duration;
+    private int duration;
     @JsonProperty("keystone_level")
     private int keystoneLevel;
     @JsonProperty("completed_timestamp")
     private long completedTimestamp;
     private List<RunMember> members;
-
     private KeyIdName dungeon;
-    private KeyIdName season;
-
-    // leaderboard only
-    private int ranking;
+    private int ranking; // leaderboard only
 }

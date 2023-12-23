@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MythicKeystoneProfileSeason {
-    private KeyIdName period;
-    @JsonProperty("best_runs")
-    private List<BestRun> bestRuns;
+public class SpecIndex {
+    @JsonProperty("character_specializations")
+    private List<KeyIdName> characterSpecializations;
 }

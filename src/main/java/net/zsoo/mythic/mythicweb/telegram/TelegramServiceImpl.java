@@ -13,16 +13,22 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.zsoo.mythic.mythicweb.crawler.RecordSaveEvent;
 import net.zsoo.mythic.mythicweb.dto.MythicBotuser;
 import net.zsoo.mythic.mythicweb.dto.MythicBotuserPlayer;
 import net.zsoo.mythic.mythicweb.dto.MythicBotuserRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicDungeon;
 import net.zsoo.mythic.mythicweb.dto.MythicDungeonRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicRecord;
+import net.zsoo.mythic.mythicweb.dto.MythicRecordPlayer;
 import net.zsoo.mythic.mythicweb.dto.MythicRecordRepository;
 
 @Slf4j
@@ -32,6 +38,7 @@ public class TelegramServiceImpl implements TelegramService {
     private final MythicBotuserRepository botUserRepo;
     private final MythicRecordRepository recordRepo;
     private final MythicDungeonRepository dungeonRepo;
+    private final TelegramLongPollingBot telegramBot;
 
     @Value("${mythic.telegram.sessionPrefix:}")
     private String sessionPrefix;
@@ -127,22 +134,64 @@ public class TelegramServiceImpl implements TelegramService {
         String name = (rn.indexOf("-") > 0) ? rn.substring(0, rn.indexOf("-")) : rn;
 
         List<MythicRecord> records = recordRepo.findRecentRecords(realm, name, 0, 10);
+        return records.stream().map(this::recordToMessage).collect(Collectors.joining("\n\n"));
+    }
 
+    @EventListener
+    public void telegramUpdate(TelegramUpdateEvent event) throws InterruptedException {
+        var update = event.getUpdate();
+        long chatId = update.getMessage().getChat().getId();
+        String text = update.getMessage().getText();
+        String reply = onMessage(chatId, text);
+        if (reply == null || reply.equals("")) {
+            return;
+        }
+        try {
+            telegramBot.execute(new SendMessage(Long.toString(chatId), reply));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @EventListener
+    public void recordSaved(RecordSaveEvent event) throws InterruptedException {
+        MythicRecord record = event.getRecord();
+        List<String> chatIds = new ArrayList<>();
+        for (MythicRecordPlayer player : record.getPlayers()) {
+            List<MythicBotuser> users = botUserRepo.findByPlayerRealmAndPlayerName(player.getPlayerRealm(),
+                    player.getPlayerName());
+            chatIds.addAll(users.stream().map(MythicBotuser::getId).toList());
+        }
+        if (chatIds.size() == 0) {
+            return;
+        }
+
+        String message = recordToMessage(record);
+        try {
+            for (String chatId : chatIds) {
+                telegramBot.execute(new SendMessage(chatId, message));
+            }
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String recordToMessage(MythicRecord r) {
         MessageFormat mf = new MessageFormat("{0}+{1} {2}\n({3}) {4}분 {5}초");
         MessageFormat mf2 = new MessageFormat("\n{0}-{1} {2} {3}");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        return records.stream().map(r -> mf.format(new Object[] {
+        String message = mf.format(new Object[] {
                 dungeonRepo.findById(r.getDungeonId()).map(MythicDungeon::getDungeonName).orElse("??"),
                 r.getKeystoneLevel(),
                 df.format(new Date(r.getCompletedTimestamp())),
                 r.getKeystoneUpgrade(),
                 r.getDuration() / 60000,
-                (r.getDuration() / 1000) % 60 })
-                + r.getPlayers().stream()
-                        .map(p -> mf2.format(
-                                new Object[] { p.getPlayerName(), p.getPlayerRealm(), p.getSpecName(),
-                                        p.getClassName() }))
-                        .collect(Collectors.joining()))
-                .collect(Collectors.joining("\n\n"));
+                (r.getDuration() / 1000) % 60 });
+
+        message += r.getPlayers().stream()
+                .map(p -> mf2.format(
+                        new Object[] { p.getPlayerName(), p.getPlayerRealm(), p.getSpecName(), p.getClassName() }))
+                .collect(Collectors.joining());
+        return message;
     }
 }

@@ -1,11 +1,11 @@
 package net.zsoo.mythic.mythicweb.telegram;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -24,7 +24,8 @@ public class TelegramConfiguration {
     @Value("${mythic.telegram.token:}")
     private String botToken;
 
-    private final TelegramService telegramService;
+    private final ApplicationEventPublisher publisher;
+    private MythicBot mythicBot;
 
     @Bean
     public TelegramBotsApi getBotsApi() {
@@ -33,11 +34,19 @@ public class TelegramConfiguration {
         }
         try {
             TelegramBotsApi api = new TelegramBotsApi(DefaultBotSession.class);
-            api.registerBot(new MythicBot());
+            api.registerBot(getTelegramBot());
             return api;
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean
+    public TelegramLongPollingBot getTelegramBot() {
+        if (mythicBot == null) {
+            mythicBot = new MythicBot();
+        }
+        return mythicBot;
     }
 
     class MythicBot extends TelegramLongPollingBot {
@@ -47,17 +56,7 @@ public class TelegramConfiguration {
 
         @Override
         public void onUpdateReceived(Update update) {
-            long chatId = update.getMessage().getChat().getId();
-            String text = update.getMessage().getText();
-            String reply = telegramService.onMessage(chatId, text);
-            if (reply == null || reply.equals("")) {
-                return;
-            }
-            try {
-                execute(new SendMessage(Long.toString(chatId), reply));
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            publisher.publishEvent(new TelegramUpdateEvent(update));
         }
 
         @Override

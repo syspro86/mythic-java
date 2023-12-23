@@ -7,5 +7,4 @@ public class RunMemberProfile {
     private String id;
     private String name;
     private KeyIdName realm;
-    private KeyIdName specialization;
 }
