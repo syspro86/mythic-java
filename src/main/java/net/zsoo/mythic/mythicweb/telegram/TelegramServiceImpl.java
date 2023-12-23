@@ -9,7 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -157,7 +159,7 @@ public class TelegramServiceImpl implements TelegramService {
     @EventListener
     public void recordSaved(RecordSaveEvent event) throws InterruptedException {
         MythicRecord record = event.getRecord();
-        List<String> chatIds = new ArrayList<>();
+        Set<String> chatIds = new HashSet<>();
         for (MythicRecordPlayer player : record.getPlayers()) {
             List<MythicBotuser> users = botUserRepo.findByPlayerRealmAndPlayerName(player.getPlayerRealm(),
                     player.getPlayerName());
