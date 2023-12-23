@@ -25,7 +25,6 @@ public class UpdatePlayerTask {
     private final CrawlerCommonService crawlerService;
     private final ProfileAPI wowApi;
     private final PlayerRealmRepository realmRepo;
-    private final MythicSeasonRepository seasonRepo;
     private final MythicPeriodRepository periodRepo;
 
     @Scheduled(cron = "${mythic.crawler.player.cron:-}")
