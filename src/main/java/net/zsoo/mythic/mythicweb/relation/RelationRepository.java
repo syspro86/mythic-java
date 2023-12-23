@@ -7,23 +7,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import net.zsoo.mythic.mythicweb.dto.MythicRecordPlayer;
-import net.zsoo.mythic.mythicweb.dto.MythicRecordPlayerId;
 
-public interface RelationRepository extends JpaRepository<MythicRecordPlayer, MythicRecordPlayerId> {
-        @Query("""
-                        SELECT playerRealm playerRealm, playerName playerName, COUNT(1) playCount FROM MythicRecordPlayer
-                        WHERE recordId IN (
-                        SELECT mbp.recordId FROM MythicRecordPlayer mbp
-                        WHERE mbp.playerRealm = :playerRealm
-                        AND mbp.playerName = :playerName
-                        )
-                        GROUP BY playerRealm, playerName
-                        HAVING COUNT(1) >= :minimumRun
-                           AND (playerRealm <> :playerRealm
-                            OR  playerName <> :playerName)
-                        ORDER BY 3 DESC
-                        LIMIT 100
-                        """)
-        List<RelationResult> findGroupByRelationList(@Param("playerRealm") String playerRealm,
-                        @Param("playerName") String playerName, @Param("minimumRun") int minimumRun);
+public interface RelationRepository extends JpaRepository<MythicRecordPlayer, Long> {
+    @Query("""
+            SELECT MRP2.playerRealm playerRealm, MRP2.playerName playerName, COUNT(1) playCount
+                FROM MythicRecord MR JOIN MR.players MRP1 JOIN MR.players MRP2
+                WHERE MRP1.playerRealm = :playerRealm
+                AND MRP1.playerName = :playerName
+                GROUP BY MRP2.playerRealm, MRP2.playerName
+            HAVING COUNT(1) >= :minimumRun
+                AND (MRP2.playerRealm <> :playerRealm
+                OR  MRP2.playerName <> :playerName)
+                ORDER BY 3 DESC
+                LIMIT 100
+            """)
+    List<RelationResult> findGroupByRelationList(@Param("playerRealm") String playerRealm,
+            @Param("playerName") String playerName, @Param("minimumRun") int minimumRun);
 }

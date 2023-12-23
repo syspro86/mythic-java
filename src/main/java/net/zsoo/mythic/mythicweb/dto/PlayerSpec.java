@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 @Entity
-public class PlayerRealm {
+public class PlayerSpec {
     @Id
-    private int realmId;
-    private String realmSlug;
-    private String realmName;
-    private boolean isConnectedRealm;
+    private int id;
+    private String name;
+    private String className;
+    private String role;
 }
