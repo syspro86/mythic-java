@@ -30,11 +30,11 @@ public class UpdatePlayerTask {
     public void onTimer() {
         long now = System.currentTimeMillis();
         log.debug("time: {}", now);
+        long endTime = now + 55000;
 
         String accessToken = crawlerService.getAccessToken();
         log.debug("token: {}", accessToken);
 
-        long endTime = now - now % 60000 + 55000;
         int season = crawlerService.getSeason();
 
         while (true) {
