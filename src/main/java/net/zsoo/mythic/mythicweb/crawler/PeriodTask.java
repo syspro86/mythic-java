@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 import lombok.extern.slf4j.Slf4j;
 import net.zsoo.mythic.mythicweb.battlenet.wow.DataAPI;
 import net.zsoo.mythic.mythicweb.battlenet.wow.StaticDataAPI;
