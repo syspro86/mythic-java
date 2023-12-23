@@ -13,7 +13,6 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfile;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfileSeason;
 import net.zsoo.mythic.mythicweb.crawler.CrawlerRepository.NextPlayer;
 import net.zsoo.mythic.mythicweb.dto.MythicPeriodRepository;
-import net.zsoo.mythic.mythicweb.dto.MythicSeasonRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 
@@ -36,10 +35,11 @@ public class UpdatePlayerTask {
         log.debug("token: {}", accessToken);
 
         long endTime = now - now % 60000 + 55000;
+        int season = crawlerService.getSeason();
 
         while (true) {
             NextPlayer nextPlayer = getNextPlayer(now);
-            updatePlayer(accessToken, nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName());
+            updatePlayer(season, nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName(), accessToken);
 
             if (System.currentTimeMillis() >= endTime) {
                 break;
@@ -47,7 +47,7 @@ public class UpdatePlayerTask {
         }
     }
 
-    private void updatePlayer(String accessToken, String playerRealm, String playerName) {
+    private void updatePlayer(int curSeason, String playerRealm, String playerName, String accessToken) {
         log.debug("player: {}-{}", playerName, playerRealm);
         PlayerRealm realm = realmRepo.findByRealmName(playerRealm)
                 .orElseThrow(() -> new RuntimeException("invalid realm name " + playerRealm));
@@ -60,7 +60,7 @@ public class UpdatePlayerTask {
         if (period != null) {
             period.getBestRuns().forEach(run -> {
                 log.debug("run: {}", run);
-                crawlerService.saveRun(crawlerService.getSeason(), period.getPeriod().getId(), run);
+                crawlerService.saveRun(curSeason, period.getPeriod().getId(), run);
             });
         }
         var seasons = result.getSeasons();

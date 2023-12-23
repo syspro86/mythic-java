@@ -11,6 +11,7 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Dungeon;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.DungeonIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicLeaderboardIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicLeaderboardPeriod;
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Period;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.PeriodIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.RealmIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.SeasonIndex;
@@ -22,6 +23,9 @@ public interface DataAPI {
 
         @RequestMapping(method = RequestMethod.GET, value = "/data/wow/mythic-keystone/period/index")
         PeriodIndex periodIndex(@RequestParam("access_token") String accessToken);
+
+        @RequestMapping(method = RequestMethod.GET, value = "/data/wow/mythic-keystone/period/{period}")
+        Period period(@PathVariable("period") int period, @RequestParam("access_token") String accessToken);
 
         @RequestMapping(method = RequestMethod.GET, value = "/data/wow/realm/index")
         RealmIndex realmIndex(@RequestParam("access_token") String accessToken);

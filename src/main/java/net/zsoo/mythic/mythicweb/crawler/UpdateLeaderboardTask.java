@@ -31,28 +31,31 @@ public class UpdateLeaderboardTask {
         String accessToken = crawlerService.getAccessToken();
         log.debug("token: {}", accessToken);
 
+        int period = periodTask.getPeriod();
+        int season = periodTask.getSeason();
+
         List<PlayerRealm> realms = realmRepo.findAll();
         for (PlayerRealm realm : realms) {
             if (!realm.isConnectedRealm()) {
                 continue;
             }
-            updateRealm(realm, accessToken);
+            updateRealm(season, period, realm, accessToken);
         }
 
         log.debug("done!");
     }
 
-    private void updateRealm(PlayerRealm realm, String accessToken) {
+    private void updateRealm(int season, int period, PlayerRealm realm, String accessToken) {
         MythicLeaderboardIndex index = dataApi.mythicLeaderboardIndex(realm.getRealmId(), accessToken);
         if (index.getCurrentLeaderboards() == null) {
             return;
         }
-        index.getCurrentLeaderboards().forEach(id -> updateRealmDungeon(realm, id.getId(), accessToken));
+        index.getCurrentLeaderboards()
+                .forEach(id -> updateRealmDungeon(season, period, realm, id.getId(), accessToken));
     }
 
-    private void updateRealmDungeon(PlayerRealm realm, int dungeonId, String accessToken) {
-        int period = periodTask.getPeriod();
-        int season = periodTask.getSeason();
+    private void updateRealmDungeon(int season, int period, PlayerRealm realm, int dungeonId, String accessToken) {
+
         MythicLeaderboardPeriod leaderboard = dataApi.mythicLeaderboardPeriod(realm.getRealmId(),
                 dungeonId, period, accessToken);
         if (leaderboard.getLeadingGroups() == null) {

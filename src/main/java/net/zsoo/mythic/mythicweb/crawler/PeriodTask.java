@@ -15,6 +15,7 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.StaticDataAPI;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Dungeon;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.DungeonIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.KeyIdName;
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Period;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.PeriodIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.PlayableSpec;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Realm;
@@ -22,6 +23,8 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.dto.RealmIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.SpecIndex;
 import net.zsoo.mythic.mythicweb.dto.MythicDungeon;
 import net.zsoo.mythic.mythicweb.dto.MythicDungeonRepository;
+import net.zsoo.mythic.mythicweb.dto.MythicPeriod;
+import net.zsoo.mythic.mythicweb.dto.MythicPeriodRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriod;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriodRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
@@ -38,8 +41,10 @@ public class PeriodTask {
     private final StaticDataAPI staticApi;
     private int period = 0;
     private int season = 0;
+    private long periodEnd = 0;
 
-    private final MythicSeasonPeriodRepository periodRepo;
+    private final MythicSeasonPeriodRepository seasonPeriodRepo;
+    private final MythicPeriodRepository periodRepo;
     private final PlayerRealmRepository realmRepo;
     private final MythicDungeonRepository dungeonRepo;
     private final PlayerSpecRepository specRepo;
@@ -58,10 +63,16 @@ public class PeriodTask {
 
         PeriodIndex periodIndex = dataApi.periodIndex(accessToken);
         period = periodIndex.getCurrentPeriod().getId();
+        savePeriod(dataApi.period(period, accessToken));
 
-        Optional<MythicSeasonPeriod> seasonPeriod = periodRepo.findTopByPeriodOrderBySeasonAsc(period);
+        Optional<MythicSeasonPeriod> seasonPeriod = seasonPeriodRepo.findTopByPeriodOrderBySeasonAsc(period);
         if (seasonPeriod.isPresent()) {
             season = seasonPeriod.get().getSeason();
+        }
+
+        if (System.currentTimeMillis() > periodEnd) {
+            // period API 응답이 최신화 되지 않은 경우
+            return;
         }
 
         RealmIndex realmIndex = dataApi.realmIndex(accessToken);
@@ -83,6 +94,9 @@ public class PeriodTask {
     }
 
     public int getPeriod() {
+        if (periodEnd < System.currentTimeMillis()) {
+            updatePeriod();
+        }
         if (period == 0) {
             updatePeriod();
         }
@@ -96,12 +110,22 @@ public class PeriodTask {
         return season;
     }
 
+    private void savePeriod(Period src) {
+        MythicPeriod period = new MythicPeriod();
+        period.setPeriod(src.getId());
+        period.setStartTimestamp(src.getStartTimestamp());
+        period.setEndTimestamp(src.getEndTimestamp());
+        periodRepo.save(period);
+
+        periodEnd = period.getEndTimestamp();
+    }
+
     private void saveRealm(Realm src) {
         PlayerRealm realm = new PlayerRealm();
         realm.setRealmId(src.getId());
         realm.setRealmName(src.getName());
         realm.setRealmSlug(src.getSlug());
-        // realm.setConnectedRealm(false);
+        // realm.setConnectedRealm(false); // TODO 체크로직 추가
         // realmRepo.save(realm);
     }
 
