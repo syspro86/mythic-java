@@ -55,7 +55,7 @@ public class UpdateLeaderboardTask {
     }
 
     private void updateRealmDungeon(int season, int period, PlayerRealm realm, int dungeonId, String accessToken) {
-
+        log.info("s:{} p:{} r:{} d:{}", season, period, realm.getRealmName(), dungeonId);
         MythicLeaderboardPeriod leaderboard = dataApi.mythicLeaderboardPeriod(realm.getRealmId(),
                 dungeonId, period, accessToken);
         if (leaderboard.getLeadingGroups() == null) {

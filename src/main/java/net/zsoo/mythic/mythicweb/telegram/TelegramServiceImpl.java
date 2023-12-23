@@ -148,6 +148,7 @@ public class TelegramServiceImpl implements TelegramService {
         }
         try {
             telegramBot.execute(new SendMessage(Long.toString(chatId), reply));
+            log.info("message sent! {} {}", chatId, reply);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
@@ -170,6 +171,7 @@ public class TelegramServiceImpl implements TelegramService {
         try {
             for (String chatId : chatIds) {
                 telegramBot.execute(new SendMessage(chatId, message));
+                log.info("message sent! {} {}", chatId, message);
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();

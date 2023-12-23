@@ -64,6 +64,8 @@ public class PeriodTask {
         period = periodIndex.getCurrentPeriod().getId();
         savePeriod(dataApi.period(period, accessToken));
 
+        log.info("period: {}, end: {}", period, periodEnd);
+
         Optional<MythicSeasonPeriod> seasonPeriod = seasonPeriodRepo.findTopByPeriodOrderBySeasonAsc(period);
         if (seasonPeriod.isPresent()) {
             season = seasonPeriod.get().getSeason();
