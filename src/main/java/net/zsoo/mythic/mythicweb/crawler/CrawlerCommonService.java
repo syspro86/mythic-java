@@ -163,6 +163,7 @@ public class CrawlerCommonService {
             player.setSpecName(spec.getName());
             player.setClassName(spec.getClassName());
             player.setRoleName(spec.getRole());
+            player.setPlayerId(Integer.parseInt(profile.getId()));
             return player;
         }).collect(Collectors.toCollection(ArrayList::new)));
 

@@ -24,7 +24,7 @@ public class MythicRecordPlayer {
     private String className;
     private String specName;
     private String roleName;
-    private String playerId;
+    private Integer playerId;
 
     @ManyToOne
     @JoinColumn(name = "recordId", referencedColumnName = "recordId")
