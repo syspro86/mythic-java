@@ -57,7 +57,7 @@ public class UpdatePlayerTask {
             return;
         }
         var period = result.getCurrentPeriod();
-        if (period != null) {
+        if (period != null && period.getBestRuns() != null) {
             period.getBestRuns().forEach(run -> {
                 log.debug("run: {}", run);
                 crawlerService.saveRun(curSeason, period.getPeriod().getId(), run);
