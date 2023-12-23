@@ -13,6 +13,9 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfile;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfileSeason;
 import net.zsoo.mythic.mythicweb.crawler.CrawlerRepository.NextPlayer;
 import net.zsoo.mythic.mythicweb.dto.MythicPeriodRepository;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayer;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayerId;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayerRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 
@@ -25,6 +28,7 @@ public class UpdatePlayerTask {
     private final ProfileAPI wowApi;
     private final PlayerRealmRepository realmRepo;
     private final MythicPeriodRepository periodRepo;
+    private final MythicPlayerRepository playerRepo;
 
     @Scheduled(cron = "${mythic.crawler.player.cron:-}")
     public void onTimer() {
@@ -39,12 +43,31 @@ public class UpdatePlayerTask {
 
         while (true) {
             NextPlayer nextPlayer = getNextPlayer(now);
-            updatePlayer(season, nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName(), accessToken);
+            try {
+                updatePlayer(season, nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName(), accessToken);
+            } catch (Exception e) {
+                log.error("갱신 오류", e);
+            }
+            setPlayerUpdateTime(nextPlayer);
 
             if (System.currentTimeMillis() >= endTime) {
                 break;
             }
         }
+    }
+
+    private NextPlayer getNextPlayer(long now) {
+        Optional<NextPlayer> player = crawlerRepo.findNextUpdatePlayer1();
+        if (!player.isPresent()) {
+            player = crawlerRepo.findNextUpdatePlayer2();
+        }
+        if (!player.isPresent()) {
+            player = crawlerRepo.findNextUpdatePlayer3(now - 1000 * 60 * 60 * 24);
+        }
+        if (!player.isPresent()) {
+            player = crawlerRepo.findNextUpdatePlayer4();
+        }
+        return player.get();
     }
 
     private void updatePlayer(int curSeason, String playerRealm, String playerName, String accessToken) {
@@ -81,17 +104,23 @@ public class UpdatePlayerTask {
         }
     }
 
-    private NextPlayer getNextPlayer(long now) {
-        Optional<NextPlayer> player = crawlerRepo.findNextUpdatePlayer1();
-        if (!player.isPresent()) {
-            player = crawlerRepo.findNextUpdatePlayer2();
-        }
-        if (!player.isPresent()) {
-            player = crawlerRepo.findNextUpdatePlayer3(now - 1000 * 60 * 60 * 24);
-        }
-        if (!player.isPresent()) {
-            player = crawlerRepo.findNextUpdatePlayer4();
-        }
-        return player.get();
+    private void setPlayerUpdateTime(NextPlayer nextPlayer) {
+        var player = playerRepo.findById(new MythicPlayerId(nextPlayer.getPlayerRealm(), nextPlayer.getPlayerName()))
+                .orElseGet(() -> {
+                    var p = new MythicPlayer();
+                    p.setPlayerRealm(nextPlayer.getPlayerRealm());
+                    p.setPlayerName(nextPlayer.getPlayerName());
+                    p.setSpecId(0);
+                    p.setClassName("null");
+                    p.setSpecName("null");
+                    return p;
+                });
+        // TODO
+        // player.setSpecId( xx );
+        // player.setClassName( xx );
+        // player.setSpecName( xx );
+        player.setLastUpdateTs(System.currentTimeMillis());
+        playerRepo.save(player);
     }
+
 }
