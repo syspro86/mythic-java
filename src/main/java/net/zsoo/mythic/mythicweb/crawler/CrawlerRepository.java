@@ -27,7 +27,7 @@ public interface CrawlerRepository extends Repository<MythicPlayer, MythicPlayer
 
   @Query("""
       SELECT MRP.playerRealm playerRealm, MRP.playerName playerName
-        FROM MythicRecord MR JOIN MR.players MRP JOIN MythicPlayer MP
+        FROM MythicRecord MR JOIN MR.players MRP LEFT JOIN MythicPlayer MP
        WHERE MRP.playerRealm = MP.playerRealm
          AND MRP.playerName = MP.playerName
          AND MR.period = (SELECT MAX(MSP.period) FROM MythicSeasonPeriod MSP)
