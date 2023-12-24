@@ -1,5 +1,8 @@
 package net.zsoo.mythic.mythicweb.crawler;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,7 +43,8 @@ public class UpdatePlayerTask {
         log.debug("token: {}", accessToken);
 
         int season = crawlerService.getSeason();
-
+        int collectedPlayerCount = 0;
+        long started = now;
         while (true) {
             NextPlayer nextPlayer = getNextPlayer(now);
             try {
@@ -49,11 +53,15 @@ public class UpdatePlayerTask {
                 log.error("갱신 오류", e);
             }
             setPlayerUpdateTime(nextPlayer);
+            collectedPlayerCount++;
 
-            if (System.currentTimeMillis() >= endTime) {
+            if ((now = System.currentTimeMillis()) >= endTime) {
                 break;
             }
         }
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        log.info("{} ~ {}: {} plyaer collected", df.format(new Date(started)), df.format(new Date(now)),
+                collectedPlayerCount);
     }
 
     private NextPlayer getNextPlayer(long now) {
