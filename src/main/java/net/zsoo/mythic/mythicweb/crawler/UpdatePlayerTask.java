@@ -70,7 +70,7 @@ public class UpdatePlayerTask {
             player = crawlerRepo.findNextUpdatePlayer2();
         }
         if (!player.isPresent()) {
-            player = crawlerRepo.findNextUpdatePlayer3(now - 1000 * 60 * 60 * 24);
+            // player = crawlerRepo.findNextUpdatePlayer3(now - 1000 * 60 * 60 * 24);
         }
         if (!player.isPresent()) {
             player = crawlerRepo.findNextUpdatePlayer4();
