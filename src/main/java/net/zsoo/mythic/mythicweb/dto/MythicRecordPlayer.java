@@ -30,8 +30,8 @@ public class MythicRecordPlayer {
     @JoinColumn(name = "recordId", referencedColumnName = "recordId")
     private MythicRecord record;
 
-    // @ManyToOne
-    // @JoinColumn(name = "playerRealm", updatable = false, insertable = false)
-    // @JoinColumn(name = "playerName", updatable = false, insertable = false)
-    // private MythicPlayer player;
+    @ManyToOne
+    @JoinColumn(name = "playerRealm", updatable = false, insertable = false)
+    @JoinColumn(name = "playerName", updatable = false, insertable = false)
+    private MythicPlayer player;
 }
