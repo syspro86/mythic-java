@@ -27,10 +27,8 @@ public interface CrawlerRepository extends Repository<MythicPlayer, MythicPlayer
 
   @Query("""
       SELECT MRP.playerRealm playerRealm, MRP.playerName playerName
-        FROM MythicRecord MR JOIN MR.players MRP LEFT JOIN MythicPlayer MP
-       WHERE MRP.playerRealm = MP.playerRealm
-         AND MRP.playerName = MP.playerName
-         AND MR.period = (SELECT MAX(MSP.period) FROM MythicSeasonPeriod MSP)
+        FROM MythicRecord MR JOIN MR.players MRP LEFT JOIN MRP.player MP
+       WHERE MR.period = (SELECT MAX(MSP.period) FROM MythicSeasonPeriod MSP)
          AND MR.keystoneLevel >= 20
          AND MR.keystoneUpgrade >= 1
          AND MP IS NULL
@@ -41,10 +39,8 @@ public interface CrawlerRepository extends Repository<MythicPlayer, MythicPlayer
 
   @Query("""
       SELECT MRP.playerRealm playerRealm, MRP.playerName playerName
-        FROM MythicRecord MR JOIN MR.players MRP JOIN MythicPlayer MP
-       WHERE MRP.playerRealm = MP.playerRealm
-         AND MRP.playerName = MP.playerName
-         AND MR.period = (SELECT MAX(MSP.period) FROM MythicSeasonPeriod MSP)
+        FROM MythicRecord MR JOIN MR.players MRP LEFT JOIN MRP.player MP
+       WHERE MR.period = (SELECT MAX(MSP.period) FROM MythicSeasonPeriod MSP)
          AND MR.keystoneLevel >= 20
          AND MR.keystoneUpgrade >= 1
          AND MP.lastUpdateTs < :timestamp
