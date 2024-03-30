@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface MythicRecordRepository extends JpaRepository<MythicRecord, String> {
 
@@ -24,4 +25,14 @@ public interface MythicRecordRepository extends JpaRepository<MythicRecord, Stri
        LIMIT :count
       """)
   List<MythicRecord> findRecentRecords(String playerRealm, String playerName, int timestamp, int count);
+
+  @Query("""
+      SELECT COUNT(1) AS cnt
+        FROM MythicRecord MR
+       WHERE 1 = 1
+         AND period = :period
+         AND completedTimestamp >= :from
+         AND completedTimestamp < :to
+      """)
+  int getRecordCount(@Param("period") int period, @Param("from") long from, @Param("to") long to);
 }

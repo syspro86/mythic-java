@@ -3,6 +3,7 @@ import CharacterList from "./character-list.js";
 import Recent from "./recent.js";
 import Relation from "./relation.js";
 import ScoreTimeline from "./score-timeline.js";
+import RecordCountChart from "./record-count-chart.js";
 
 export default {
   data() {
@@ -24,6 +25,7 @@ export default {
     Recent,
     Relation,
     ScoreTimeline,
+    RecordCountChart,
   },
   methods: {
     menuSelected(index) {
@@ -63,6 +65,9 @@ export default {
         break;
       case "timeline":
         this.menuIndex = 3;
+        break;
+      case "record-timeline":
+        this.menuIndex = 4;
         break;
     }
   },
@@ -241,6 +246,17 @@ export default {
                   this.characterName
                 );
               }
+            },
+          },
+        },
+        {
+          title: "쐐기수집건수 차트",
+          component: RecordCountChart,
+          props: {
+            showOption: this.showOption,
+          },
+          event: {
+            preSearch: () => {
             },
           },
         },
