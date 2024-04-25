@@ -31,7 +31,6 @@ import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriod;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriodRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
-import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerSpec;
 import net.zsoo.mythic.mythicweb.dto.PlayerSpecRepository;
 
@@ -49,7 +48,7 @@ public class PeriodTask {
     private final MythicSeasonRepository seasonRepo;
     private final MythicSeasonPeriodRepository seasonPeriodRepo;
     private final MythicPeriodRepository periodRepo;
-    private final PlayerRealmRepository realmRepo;
+    // private final PlayerRealmRepository realmRepo;
     private final MythicDungeonRepository dungeonRepo;
     private final PlayerSpecRepository specRepo;
 
@@ -57,7 +56,7 @@ public class PeriodTask {
     private String cronString;
 
     @Scheduled(cron = "${mythic.crawler.period.cron:-}")
-    @PostConstruct
+    // @PostConstruct
     public void updatePeriod() {
         if (cronString == null || cronString.equals("")) {
             return;
@@ -103,21 +102,17 @@ public class PeriodTask {
         });
     }
 
-    public int getPeriod() {
-        if (periodEnd < System.currentTimeMillis()) {
-            updatePeriod();
+    private void saveSeason(Season src) {
+        MythicSeason season = new MythicSeason();
+        season.setSeason(src.getId());
+        season.setSeasonName(src.getSeasonName());
+        season.setStartTimestamp(src.getStartTimestamp());
+        if (src.getEndTimestamp() == 0) {
+            season.setEndTimestamp(null);
+        } else {
+            season.setEndTimestamp(src.getEndTimestamp());
         }
-        if (period == 0) {
-            updatePeriod();
-        }
-        return period;
-    }
-
-    public int getSeason() {
-        if (season == 0) {
-            updatePeriod();
-        }
-        return season;
+        seasonRepo.save(season);
     }
 
     private void saveSeason(Season src) {

@@ -19,7 +19,6 @@ import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 @RequiredArgsConstructor
 public class UpdateLeaderboardTask {
     private final CrawlerCommonService crawlerService;
-    private final PeriodTask periodTask;
     private final DataAPI dataApi;
     private final PlayerRealmRepository realmRepo;
 
@@ -31,8 +30,8 @@ public class UpdateLeaderboardTask {
         String accessToken = crawlerService.getAccessToken();
         log.debug("token: {}", accessToken);
 
-        int period = periodTask.getPeriod();
-        int season = periodTask.getSeason();
+        int period = crawlerService.getPeriod();
+        int season = crawlerService.getSeason();
 
         List<PlayerRealm> realms = realmRepo.findAll();
         for (PlayerRealm realm : realms) {

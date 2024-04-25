@@ -62,7 +62,6 @@ public class CrawlerCommonService {
     private int period = 0;
     private int season = 0;
 
-    @Retryable(Exception.class)
     private void updateSeasonPeriod() {
         String accessToken = getAccessToken();
         log.debug("token: {}", accessToken);
@@ -186,7 +185,7 @@ public class CrawlerCommonService {
             idString += player.getPlayerRealm().substring(0, 1) + player.getPlayerName().substring(0, 1);
         }
         record.setRecordId(idString);
-        if (idCache.contains(idString)) {
+        if (idString == null || idCache.contains(idString)) {
             return;
         }
 
