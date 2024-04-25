@@ -185,7 +185,7 @@ public class CrawlerCommonService {
             idString += player.getPlayerRealm().substring(0, 1) + player.getPlayerName().substring(0, 1);
         }
         record.setRecordId(idString);
-        if (idCache.contains(idString)) {
+        if (idString == null || idCache.contains(idString)) {
             return;
         }
 
