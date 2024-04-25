@@ -114,19 +114,6 @@ public class PeriodTask {
         }
         seasonRepo.save(season);
     }
-
-    private void saveSeason(Season src) {
-        MythicSeason season = new MythicSeason();
-        season.setSeason(src.getId());
-        season.setSeasonName(src.getSeasonName());
-        season.setStartTimestamp(src.getStartTimestamp());
-        if (src.getEndTimestamp() == 0) {
-            season.setEndTimestamp(null);
-        } else {
-            season.setEndTimestamp(src.getEndTimestamp());
-        }
-        seasonRepo.save(season);
-    }
     
     private void savePeriod(Period src) {
         MythicPeriod period = new MythicPeriod();
