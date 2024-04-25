@@ -31,7 +31,6 @@ import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriod;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriodRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
-import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerSpec;
 import net.zsoo.mythic.mythicweb.dto.PlayerSpecRepository;
 
@@ -49,7 +48,7 @@ public class PeriodTask {
     private final MythicSeasonRepository seasonRepo;
     private final MythicSeasonPeriodRepository seasonPeriodRepo;
     private final MythicPeriodRepository periodRepo;
-    private final PlayerRealmRepository realmRepo;
+    // private final PlayerRealmRepository realmRepo;
     private final MythicDungeonRepository dungeonRepo;
     private final PlayerSpecRepository specRepo;
 
@@ -57,7 +56,7 @@ public class PeriodTask {
     private String cronString;
 
     @Scheduled(cron = "${mythic.crawler.period.cron:-}")
-    @PostConstruct
+    // @PostConstruct
     public void updatePeriod() {
         if (cronString == null || cronString.equals("")) {
             return;
@@ -103,23 +102,6 @@ public class PeriodTask {
         });
     }
 
-    public int getPeriod() {
-        if (periodEnd < System.currentTimeMillis()) {
-            updatePeriod();
-        }
-        if (period == 0) {
-            updatePeriod();
-        }
-        return period;
-    }
-
-    public int getSeason() {
-        if (season == 0) {
-            updatePeriod();
-        }
-        return season;
-    }
-
     private void saveSeason(Season src) {
         MythicSeason season = new MythicSeason();
         season.setSeason(src.getId());
@@ -132,7 +114,7 @@ public class PeriodTask {
         }
         seasonRepo.save(season);
     }
-    
+
     private void savePeriod(Period src) {
         MythicPeriod period = new MythicPeriod();
         period.setPeriod(src.getId());
