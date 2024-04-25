@@ -14,12 +14,16 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicLeaderboardPeriod;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Period;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.PeriodIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.RealmIndex;
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Season;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.SeasonIndex;
 
 @FeignClient(name = "api.blizzard.com/data", url = "https://${mythic.battlenet.region:kr}.api.blizzard.com/", configuration = DataAPIConfiguration.class, dismiss404 = true)
 public interface DataAPI {
         @RequestMapping(method = RequestMethod.GET, value = "/data/wow/mythic-keystone/season/index")
         SeasonIndex seasonIndex(@RequestParam("access_token") String accessToken);
+
+        @RequestMapping(method = RequestMethod.GET, value = "/data/wow/mythic-keystone/season/{season}")
+        Season season(@PathVariable("season") int season, @RequestParam("access_token") String accessToken);
 
         @RequestMapping(method = RequestMethod.GET, value = "/data/wow/mythic-keystone/period/index")
         PeriodIndex periodIndex(@RequestParam("access_token") String accessToken);
