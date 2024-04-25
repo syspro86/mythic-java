@@ -62,7 +62,6 @@ public class CrawlerCommonService {
     private int period = 0;
     private int season = 0;
 
-    @Retryable(Exception.class)
     private void updateSeasonPeriod() {
         String accessToken = getAccessToken();
         log.debug("token: {}", accessToken);
