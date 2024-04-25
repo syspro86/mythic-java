@@ -19,13 +19,17 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.dto.PeriodIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.PlayableSpec;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Realm;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.RealmIndex;
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Season;
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.SeasonIndex;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.SpecIndex;
 import net.zsoo.mythic.mythicweb.dto.MythicDungeon;
 import net.zsoo.mythic.mythicweb.dto.MythicDungeonRepository;
 import net.zsoo.mythic.mythicweb.dto.MythicPeriod;
 import net.zsoo.mythic.mythicweb.dto.MythicPeriodRepository;
+import net.zsoo.mythic.mythicweb.dto.MythicSeason;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriod;
 import net.zsoo.mythic.mythicweb.dto.MythicSeasonPeriodRepository;
+import net.zsoo.mythic.mythicweb.dto.MythicSeasonRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 import net.zsoo.mythic.mythicweb.dto.PlayerSpec;
@@ -42,6 +46,7 @@ public class PeriodTask {
     private int season = 0;
     private long periodEnd = 0;
 
+    private final MythicSeasonRepository seasonRepo;
     private final MythicSeasonPeriodRepository seasonPeriodRepo;
     private final MythicPeriodRepository periodRepo;
     private final PlayerRealmRepository realmRepo;
@@ -59,6 +64,10 @@ public class PeriodTask {
         }
         String accessToken = crawlerSerivce.getAccessToken();
         log.debug("token: {}", accessToken);
+
+        SeasonIndex seasonIndex = dataApi.seasonIndex(accessToken);
+        season = seasonIndex.getCurrentSeason().getId();
+        saveSeason(dataApi.season(season, accessToken));
 
         PeriodIndex periodIndex = dataApi.periodIndex(accessToken);
         period = periodIndex.getCurrentPeriod().getId();
@@ -111,14 +120,34 @@ public class PeriodTask {
         return season;
     }
 
+    private void saveSeason(Season src) {
+        MythicSeason season = new MythicSeason();
+        season.setSeason(src.getId());
+        season.setSeasonName(src.getSeasonName());
+        season.setStartTimestamp(src.getStartTimestamp());
+        if (src.getEndTimestamp() == 0) {
+            season.setEndTimestamp(null);
+        } else {
+            season.setEndTimestamp(src.getEndTimestamp());
+        }
+        seasonRepo.save(season);
+    }
+    
     private void savePeriod(Period src) {
         MythicPeriod period = new MythicPeriod();
         period.setPeriod(src.getId());
         period.setStartTimestamp(src.getStartTimestamp());
         period.setEndTimestamp(src.getEndTimestamp());
         periodRepo.save(period);
-
         periodEnd = period.getEndTimestamp();
+
+        var season = seasonRepo.findByTimestamp(period.getStartTimestamp());
+        if (season.isPresent()) {
+            MythicSeasonPeriod seasonPeriod = new MythicSeasonPeriod();
+            seasonPeriod.setSeason(season.get().getSeason());
+            seasonPeriod.setPeriod(src.getId());
+            seasonPeriodRepo.save(seasonPeriod);
+        }
     }
 
     private void saveRealm(Realm src) {
