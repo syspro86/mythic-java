@@ -248,9 +248,7 @@ export default {
       if (this.characterName == "") {
         return;
       }
-      this.characterName =
-        this.characterName.substring(0, 1).toUpperCase() +
-        this.characterName.substring(1).toLowerCase();
+      this.$emit("preSearch");
 
       fetch(
         "char/scan/" +
