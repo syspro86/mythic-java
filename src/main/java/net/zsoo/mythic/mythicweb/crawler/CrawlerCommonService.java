@@ -128,18 +128,8 @@ public class CrawlerCommonService {
         } else {
             record.setKeystoneUpgrade(-1);
         }
-        if (true) {
-            int upgrade = dungeon.getUpgrade1();
-            int duration = record.getDuration();
-            int keystoneLevel = record.getKeystoneLevel();
-            float score = 0;
-            if (upgrade >= duration) {
-                score = 30 + keystoneLevel * 7 + Math.min((float) (upgrade - duration) / upgrade, 0.4f) * 5 / 0.4f;
-            } else if ((duration - upgrade) / upgrade < 0.4) {
-                score = 25 + Math.min(keystoneLevel, 20) * 7
-                        - Math.min((float) (duration - upgrade) / upgrade, 0.4f) * 5 / 0.4f;
-            }
-            record.setMythicRating(score);
+        if (run.getMythicRating() != null) {
+            record.setMythicRating(run.getMythicRating().getRating());
         }
 
         record.setPlayers(run.getMembers().stream().map(member -> {
@@ -189,11 +179,14 @@ public class CrawlerCommonService {
             return;
         }
 
-        if (recordRepo.findById(idString).isPresent()) {
-            idCache.add(idString);
-            return;
+        var savedRecord = recordRepo.findById(idString);
+        if (savedRecord.isPresent()) {
+            if (savedRecord.get().getMythicRating() == record.getMythicRating()) {
+                idCache.add(idString);
+                return;
+            }
         }
-
+        
         recordRepo.save(record);
         log.info("{} new record!", record.getRecordId());
         idCache.add(idString);
