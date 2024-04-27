@@ -128,7 +128,9 @@ public class CrawlerCommonService {
         } else {
             record.setKeystoneUpgrade(-1);
         }
-        if (true) {
+        if (run.getMythicRating() != null) {
+            record.setMythicRating(run.getMythicRating().getRating());
+        } else {
             int upgrade = dungeon.getUpgrade1();
             int duration = record.getDuration();
             int keystoneLevel = record.getKeystoneLevel();

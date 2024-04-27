@@ -16,4 +16,6 @@ public class BestRun {
     private List<RunMember> members;
     private KeyIdName dungeon;
     private int ranking; // leaderboard only
+    @JsonProperty("mythic_rating")
+    private MythicRating mythicRating;
 }
