@@ -1,7 +1,9 @@
 package net.zsoo.mythic.mythicweb.crawler;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
@@ -29,7 +31,7 @@ public interface CrawlerRepository extends Repository<MythicPlayer, MythicPlayer
       SELECT MRP.playerRealm playerRealm, MRP.playerName playerName
         FROM MythicRecord MR JOIN MR.players MRP LEFT JOIN MRP.player MP
        WHERE MR.period = (SELECT MAX(MSP.period) FROM MythicSeasonPeriod MSP)
-         AND MR.keystoneLevel >= 20
+         AND MR.keystoneLevel >= 10
          AND MR.keystoneUpgrade >= 1
          AND MP IS NULL
        ORDER BY MR.recordId ASC
@@ -39,20 +41,15 @@ public interface CrawlerRepository extends Repository<MythicPlayer, MythicPlayer
 
   @Query("""
       SELECT MRP.playerRealm playerRealm, MRP.playerName playerName
-        FROM MythicRecord MR JOIN MR.players MRP LEFT JOIN MRP.player MP
-       WHERE MR.period = (SELECT MAX(MSP.period) FROM MythicSeasonPeriod MSP)
-         AND MR.keystoneLevel >= 20
-         AND MR.keystoneUpgrade >= 1
-         AND MP.lastUpdateTs < :timestamp
-       ORDER BY MP.lastUpdateTs ASC
-       LIMIT 1
+        FROM MythicRecordPlayer MRP LEFT JOIN MRP.player MP
+       WHERE MP.lastUpdateTs IS NULL
       """)
-  Optional<NextPlayer> findNextUpdatePlayer3(long timestamp);
+  List<NextPlayer> findNextUpdatePlayer3(Pageable pageable);
 
   @Query("""
       SELECT MP.playerRealm playerRealm, MP.playerName playerName FROM MythicPlayer MP
        ORDER BY MP.lastUpdateTs ASC
-      LIMIT 1
+       LIMIT 1
       """)
   Optional<NextPlayer> findNextUpdatePlayer4();
 }

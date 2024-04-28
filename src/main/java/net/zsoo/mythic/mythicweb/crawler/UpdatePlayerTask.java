@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -56,7 +57,8 @@ public class UpdatePlayerTask {
             player = crawlerRepo.findNextUpdatePlayer2();
         }
         if (!player.isPresent()) {
-            // player = crawlerRepo.findNextUpdatePlayer3(now - 1000 * 60 * 60 * 24);
+            var list = crawlerRepo.findNextUpdatePlayer3(Pageable.ofSize(1));
+            player = list.stream().findFirst();
         }
         if (!player.isPresent()) {
             player = crawlerRepo.findNextUpdatePlayer4();
