@@ -181,12 +181,12 @@ public class CrawlerCommonService {
 
         var savedRecord = recordRepo.findById(idString);
         if (savedRecord.isPresent()) {
-            if (savedRecord.get().getMythicRating() == record.getMythicRating()) {
+            if (Math.abs(savedRecord.get().getMythicRating() - record.getMythicRating()) < 0.1f) {
                 idCache.add(idString);
                 return;
             }
         }
-        
+
         recordRepo.save(record);
         log.info("{} new record!", record.getRecordId());
         idCache.add(idString);
