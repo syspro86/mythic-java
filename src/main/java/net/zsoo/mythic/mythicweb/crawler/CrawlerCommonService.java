@@ -181,10 +181,17 @@ public class CrawlerCommonService {
 
         var savedRecord = recordRepo.findById(idString);
         if (savedRecord.isPresent()) {
-            if (Math.abs(savedRecord.get().getMythicRating() - record.getMythicRating()) < 0.1f) {
+            var dbRecord = savedRecord.get();
+            if (Math.abs(dbRecord.getMythicRating() - record.getMythicRating()) < 0.1f) {
                 idCache.add(idString);
                 return;
             }
+            record.getPlayers().forEach(p -> {
+                dbRecord.getPlayers().stream()
+                        .filter(p2 -> p.getPlayerRealm().equals(p2.getPlayerRealm())
+                                && p.getPlayerName().equals(p2.getPlayerName()))
+                        .forEach(p2 -> p.setId(p2.getId()));
+            });
         }
 
         recordRepo.save(record);
