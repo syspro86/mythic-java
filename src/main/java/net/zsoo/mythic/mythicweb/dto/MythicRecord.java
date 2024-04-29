@@ -24,6 +24,6 @@ public class MythicRecord {
     private int keystoneUpgrade;
     private float mythicRating;
 
-    @OneToMany(mappedBy = "record", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "record", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     List<MythicRecordPlayer> players;
 }

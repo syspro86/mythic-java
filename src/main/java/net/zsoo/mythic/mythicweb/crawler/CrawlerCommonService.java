@@ -190,7 +190,9 @@ public class CrawlerCommonService {
                 dbRecord.getPlayers().stream()
                         .filter(p2 -> p.getPlayerRealm().equals(p2.getPlayerRealm())
                                 && p.getPlayerName().equals(p2.getPlayerName()))
-                        .forEach(p2 -> p.setId(p2.getId()));
+                        .sorted(Comparator.comparing(p2 -> p.getId()))
+                        .findFirst()
+                        .ifPresent(p2 -> p.setId(p2.getId()));
             });
         }
 
