@@ -1,8 +1,15 @@
 package net.zsoo.mythic.mythicweb.crawler;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.context.event.EventListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +17,13 @@ import net.zsoo.mythic.mythicweb.battlenet.wow.ProfileAPI;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.BestRun;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfile;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.MythicKeystoneProfileSeason;
+import net.zsoo.mythic.mythicweb.dto.MythicBotuser;
 import net.zsoo.mythic.mythicweb.dto.MythicPeriodRepository;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayer;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayerId;
+import net.zsoo.mythic.mythicweb.dto.MythicPlayerRepository;
+import net.zsoo.mythic.mythicweb.dto.MythicRecord;
+import net.zsoo.mythic.mythicweb.dto.MythicRecordPlayer;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealm;
 import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 
@@ -20,6 +33,7 @@ import net.zsoo.mythic.mythicweb.dto.PlayerRealmRepository;
 public class UpdatePlayerService {
     private final ProfileAPI wowApi;
     private final CrawlerCommonService crawlerService;
+    private final MythicPlayerRepository playerRepo;
     private final PlayerRealmRepository realmRepo;
     private final MythicPeriodRepository periodRepo;
 
@@ -60,5 +74,22 @@ public class UpdatePlayerService {
                 }
             });
         }
+    }
+
+    @EventListener
+    public void recordSaved(RecordSaveEvent event) throws InterruptedException {
+        event.getRecord().getPlayers().forEach(player -> {
+            if (playerRepo.existsById(new MythicPlayerId(player.getPlayerRealm(), player.getPlayerName()))) {
+                return;
+            }
+            var p = new MythicPlayer();
+            p.setPlayerRealm(player.getPlayerRealm());
+            p.setPlayerName(player.getPlayerName());
+            p.setSpecId(0);
+            p.setClassName("null");
+            p.setSpecName("null");
+            p.setLastUpdateTs(0);
+            playerRepo.save(p);
+        });
     }
 }
