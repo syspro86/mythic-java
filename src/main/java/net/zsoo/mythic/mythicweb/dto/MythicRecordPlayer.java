@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -28,10 +29,12 @@ public class MythicRecordPlayer {
 
     @ManyToOne
     @JoinColumn(name = "recordId", referencedColumnName = "recordId")
+    @ToString.Exclude
     private MythicRecord record;
 
     @ManyToOne
     @JoinColumn(name = "playerRealm", updatable = false, insertable = false)
     @JoinColumn(name = "playerName", updatable = false, insertable = false)
+    @ToString.Exclude
     private MythicPlayer player;
 }
