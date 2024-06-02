@@ -195,7 +195,6 @@ public class CrawlerCommonService {
 
             var recordChanged = false;
             recordChanged |= dbPlayers.size() > record.getPlayers().size();
-            recordChanged |= record.getPlayers().stream().anyMatch(p -> p.getId() == 0);
             recordChanged |= Math.abs(dbRecord.getMythicRating() - record.getMythicRating()) >= 0.1f;
 
             if (!recordChanged) {
