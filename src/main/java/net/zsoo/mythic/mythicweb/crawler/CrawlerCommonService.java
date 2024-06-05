@@ -180,6 +180,7 @@ public class CrawlerCommonService {
         }
 
         var savedRecord = recordRepo.findById(idString);
+        var updatedProperties = new HashMap<String, String>();
         if (savedRecord.isPresent()) {
             var dbRecord = savedRecord.get();
             var dbPlayers = dbRecord.getPlayers();
@@ -194,8 +195,16 @@ public class CrawlerCommonService {
             });
 
             var recordChanged = false;
-            recordChanged |= dbPlayers.size() > record.getPlayers().size();
-            recordChanged |= Math.abs(dbRecord.getMythicRating() - record.getMythicRating()) >= 0.1f;
+            if (dbPlayers.size() > record.getPlayers().size()) {
+                updatedProperties.put("member count",
+                        String.format("%d -> %d", record.getPlayers().size(), dbPlayers.size()));
+                recordChanged |= dbPlayers.size() > record.getPlayers().size();
+            }
+            if (Math.abs(dbRecord.getMythicRating() - record.getMythicRating()) >= 0.1f) {
+                updatedProperties.put("mythic rating",
+                        String.format("%f -> %f", record.getMythicRating(), dbRecord.getMythicRating()));
+                recordChanged |= Math.abs(dbRecord.getMythicRating() - record.getMythicRating()) >= 0.1f;
+            }
 
             if (!recordChanged) {
                 idCache.add(idString);
@@ -207,6 +216,6 @@ public class CrawlerCommonService {
         log.info("{} new record!", record.getRecordId());
         idCache.add(idString);
 
-        publisher.publishEvent(new RecordSaveEvent(record));
+        publisher.publishEvent(new RecordSaveEvent(record).updated(updatedProperties));
     }
 }
