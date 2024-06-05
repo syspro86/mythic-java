@@ -170,6 +170,11 @@ public class TelegramServiceImpl implements TelegramService {
         }
 
         String message = recordToMessage(record);
+        if (event.isUpdate()) {
+            message += "\n";
+            message += event.getUpdatedProperties().entrySet().stream().map(kv -> kv.getKey() + ": " + kv.getValue())
+                    .collect(Collectors.joining(", "));
+        }
         try {
             for (String chatId : chatIds) {
                 telegramBot.execute(new SendMessage(chatId, message));

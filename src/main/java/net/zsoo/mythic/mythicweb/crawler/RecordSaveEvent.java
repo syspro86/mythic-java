@@ -1,11 +1,27 @@
 package net.zsoo.mythic.mythicweb.crawler;
 
-import lombok.AllArgsConstructor;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.zsoo.mythic.mythicweb.dto.MythicRecord;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RecordSaveEvent {
-    MythicRecord record;
+    private final MythicRecord record;
+
+    boolean update;
+    Map<String, String> updatedProperties;
+
+    public RecordSaveEvent updated(Map<String, String> updatedProperties) {
+        if (updatedProperties == null) {
+            return this;
+        }
+        update = true;
+        this.updatedProperties = new HashMap<>(updatedProperties);
+        return this;
+    }
+
 }
