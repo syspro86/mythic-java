@@ -197,12 +197,12 @@ public class CrawlerCommonService {
             var recordChanged = false;
             if (dbPlayers.size() > record.getPlayers().size()) {
                 updatedProperties.put("member count",
-                        String.format("%d -> %d", record.getPlayers().size(), dbPlayers.size()));
+                        String.format("%d -> %d", dbPlayers.size(), record.getPlayers().size()));
                 recordChanged |= dbPlayers.size() > record.getPlayers().size();
             }
             if (dbRecord.getMythicRating() < record.getMythicRating()) {
                 updatedProperties.put("mythic rating",
-                        String.format("%f -> %f", record.getMythicRating(), dbRecord.getMythicRating()));
+                        String.format("%f -> %f", dbRecord.getMythicRating(), record.getMythicRating()));
                 recordChanged |= dbRecord.getMythicRating() < record.getMythicRating();
             } else {
                 record.setMythicRating(dbRecord.getMythicRating());
