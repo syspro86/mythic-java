@@ -200,7 +200,7 @@ public class CrawlerCommonService {
                         String.format("%d -> %d", dbPlayers.size(), record.getPlayers().size()));
                 recordChanged |= dbPlayers.size() > record.getPlayers().size();
             }
-            if (dbRecord.getMythicRating() < record.getMythicRating()) {
+            if (dbRecord.getMythicRating() + 0.01f < record.getMythicRating()) {
                 updatedProperties.put("mythic rating",
                         String.format("%f -> %f", dbRecord.getMythicRating(), record.getMythicRating()));
                 recordChanged |= dbRecord.getMythicRating() < record.getMythicRating();
