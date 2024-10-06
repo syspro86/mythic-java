@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import net.zsoo.mythic.mythicweb.battlenet.wow.dto.Media;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.PlayableSpec;
 import net.zsoo.mythic.mythicweb.battlenet.wow.dto.SpecIndex;
 
@@ -16,4 +17,12 @@ public interface StaticDataAPI {
 
         @RequestMapping(method = RequestMethod.GET, value = "/data/wow/playable-specialization/{specId}")
         PlayableSpec playableSpec(@PathVariable("specId") int specId, @RequestParam("access_token") String accessToken);
+
+        @RequestMapping(method = RequestMethod.GET, value = "/data/wow/media/playable-class/{classId}")
+        Media playableClassMedia(@PathVariable("classId") int classId,
+                        @RequestParam("access_token") String accessToken);
+
+        @RequestMapping(method = RequestMethod.GET, value = "/data/wow/media/playable-specialization/{specId}")
+        Media playableSpecMedia(@PathVariable("specId") int specId,
+                        @RequestParam("access_token") String accessToken);
 }
