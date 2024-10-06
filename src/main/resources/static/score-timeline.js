@@ -134,8 +134,9 @@ export default {
         let score = 0;
         for (let did in dungeonScore) {
           const arr = dungeonScore[did];
-          const dscore =
-            Math.max(arr[0], arr[1]) * 1.5 + Math.min(arr[0], arr[1]) * 0.5;
+          const dscore = (season >= 13) ?
+            Math.max(arr[0], arr[1]) :
+            (Math.max(arr[0], arr[1]) * 1.5 + Math.min(arr[0], arr[1]) * 0.5);
           score += dscore;
 
           const dname = groups.find((g) => g.id == String(did)).content;
