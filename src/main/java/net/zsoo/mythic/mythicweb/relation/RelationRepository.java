@@ -18,6 +18,7 @@ public interface RelationRepository extends JpaRepository<MythicRecordPlayer, Lo
             HAVING COUNT(1) >= :minimumRun
                 AND (MRP2.playerRealm <> :playerRealm
                 OR  MRP2.playerName <> :playerName)
+                AND MRP2.playerName <> '?'
                 ORDER BY 3 DESC
                 LIMIT 100
             """)
