@@ -86,7 +86,7 @@ public class CrawlerCommonService {
         if (accessTokenCache == null) {
             accessTokenCache = Optional.ofNullable(oauth.token())
                     .map(m -> m.get(ACCESS_TOKEN))
-                    .map(m -> m.toString())
+                    .map(m -> "Bearer " + m.toString())
                     .orElse(null);
         }
         return accessTokenCache;
