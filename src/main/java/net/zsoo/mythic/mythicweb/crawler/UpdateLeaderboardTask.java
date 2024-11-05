@@ -32,6 +32,9 @@ public class UpdateLeaderboardTask {
 
         int period = crawlerService.getPeriod();
         int season = crawlerService.getSeason();
+        if (period == 0 || season == 0) {
+            return;
+        }
 
         List<PlayerRealm> realms = realmRepo.findAll();
         for (PlayerRealm realm : realms) {
