@@ -163,7 +163,7 @@ public class CrawlerCommonService {
                 .thenComparing((MythicRecordPlayer p) -> p.getPlayerName()));
 
         DateFormat tsFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        MessageFormat idFormat = new MessageFormat("{0}_{1}_{2}_{3}_{4,number,#}_");
+        MessageFormat idFormat = new MessageFormat("{0}_{1}_{2}_{3,number,#}_{4,number,#}_");
         String idString = idFormat.format(new Object[] {
                 tsFormat.format(new Date(record.getCompletedTimestamp())),
                 dungeon.getDungeonName(),
